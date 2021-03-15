@@ -9,7 +9,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/xstats/pkg/model"
+	"github.com/quycao/xstats/pkg/model"
 )
 
 // StatsTCBS get transaction data of ticker

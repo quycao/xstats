@@ -1,3 +1,3 @@
-module github.com/xstats
+module github.com/quycao/xstats
 
 go 1.15

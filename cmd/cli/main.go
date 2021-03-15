@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/xstats/pkg/handler"
+	"github.com/quycao/xstats/pkg/handler"
 )
 
 func main() {
