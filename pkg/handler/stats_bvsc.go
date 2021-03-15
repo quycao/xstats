@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"quycao.github.io/xstats/pkg/model"
+	"github.com/xstats/pkg/model"
 )
 
 // StatsBVSC get transaction data of symbol
