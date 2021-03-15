@@ -1,0 +1,17 @@
+{
+    "image": "quycao/golang:alpine",
+    "appPort": [
+        "9002:9002"
+    ],
+    "runArgs": [
+        // "--network=hzo_portal_network",
+        "--name=xstats_api"
+    ],
+    "remoteEnv": {
+        "GOPATH": "/go",
+        "PATH": "${containerEnv:PATH}:/bin:/sbin:/usr/bin:usr/sbin:usr/local/go/bin"
+    },
+    "extensions": [
+        "golang.go"
+    ]
+}
