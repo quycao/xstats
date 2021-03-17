@@ -21,6 +21,7 @@ func main() {
 
 	// remove the delimeter from the string
 	input = strings.TrimSuffix(input, "\n")
+	input = strings.ToUpper(input)
 
 	// TCBS
 	result, err := handler.StatsTCBS(input)
