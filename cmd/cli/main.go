@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	fmt.Print("Input ticker: ")
+	fmt.Print("Input ticker symbol: ")
 	reader := bufio.NewReader(os.Stdin)
 	// ReadString will block until the delimiter is entered
 	input, err := reader.ReadString('\n')
