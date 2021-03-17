@@ -49,8 +49,9 @@ func StatsBVSC(symbol string) (*model.StatsResultBVSC, error) {
 	})
 
 	result := &model.StatsResultBVSC{}
-	if len(translogs) >= 50 {
-		translogs = translogs[:50]
+	if len(translogs) >= 0 {
+		fivePct := len(translogs) * 5 / 100
+		translogs = translogs[:fivePct]
 		var buyVol, selVol int64
 
 		for _, val := range translogs {

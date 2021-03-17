@@ -44,8 +44,9 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 	})
 
 	result := &model.StatsResultTCBS{}
-	if len(translogs) >= 50 {
-		translogs = translogs[:50]
+	if len(translogs) >= 0 {
+		fivePct := len(translogs) * 5 / 100
+		translogs = translogs[:fivePct]
 		var buyVol, selVol int64
 
 		for _, val := range translogs {
