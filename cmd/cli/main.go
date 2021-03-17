@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("%+v\n", result)
+		fmt.Println(result.ToString())
 	}
 
 	// BVSC
