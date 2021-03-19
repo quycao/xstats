@@ -14,5 +14,5 @@ type StatsResultTCBS struct {
 
 func (r *StatsResultTCBS) ToString() string {
 	return fmt.Sprintf("\nTicker:     %12v\nBuy Vol:    %12v\nSell Vol:   %12v\nBuy/Sell:  %12v%%\nStatus:     %12v\nSuggestion: %12v\n",
-		r.Ticker, r.BuyVol, r.SellVol, (r.BuyVol-r.SellVol)*100/r.SellVol, r.Status, r.Suggestion)
+		r.Ticker, r.BuyVol, r.SellVol, r.BuySellPct, r.Status, r.Suggestion)
 }

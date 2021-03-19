@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"sort"
 	"time"
@@ -44,8 +45,8 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 	})
 
 	result := &model.StatsResultTCBS{}
-	if len(translogs) >= 0 {
-		fivePct := len(translogs) * 5 / 100
+	if len(translogs) > 0 {
+		fivePct := int64(math.Round(float64(len(translogs)) * 5 / 100))
 		translogs = translogs[:fivePct]
 		var buyVol, selVol int64
 
@@ -61,18 +62,33 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 
 		status := "Bình thường"
 		suggestion := "Không"
-		if float64(buyVol) >= float64(selVol)*1.5 {
-			status = "Tích luỹ"
-			suggestion = "Mua"
-		} else if float64(selVol) >= float64(buyVol)*1.5 {
-			status = "Phân phối"
-			suggestion = "Bán"
+		var buySellPct int64
+		if selVol == 0 {
+			selVol = 1
+		}
+		if buyVol == 0 {
+			buyVol = 1
+		}
+
+		if selVol != 0 && buyVol > selVol {
+			buySellPct = int64((buyVol - selVol) * 100 / selVol)
+			if buySellPct > 50 {
+				status = "Tích luỹ"
+				suggestion = "Mua"
+			}
+		} else if buyVol != 0 && selVol > buyVol {
+			buySellPct = int64((selVol - buyVol) * (-100) / buyVol)
+			if buySellPct < -50 {
+				status = "Phân phối"
+				suggestion = "Bán"
+			}
 		}
 
 		result = &model.StatsResultTCBS{
 			Ticker:     ticker,
 			BuyVol:     buyVol,
 			SellVol:    selVol,
+			BuySellPct: buySellPct,
 			Status:     status,
 			Suggestion: suggestion,
 		}
@@ -81,7 +97,7 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 
 		// fmt.Printf("Buy: %d, Sell: %d", buyVol, selVol)
 	} else {
-		return nil, errors.New("There are less than 50 translog records")
+		return nil, errors.New("There are no translog records of " + ticker)
 		// fmt.Println("There are less than 50 translog records")
 	}
 }
