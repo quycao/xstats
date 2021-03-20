@@ -1,0 +1,10 @@
+# github.com/adshao/go-binance/v2 v2.2.1
+## explicit
+# github.com/go-co-op/gocron v1.0.0
+## explicit
+github.com/go-co-op/gocron
+# github.com/jasonlvhit/gocron v0.0.1
+## explicit
+# golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
+golang.org/x/sync/semaphore
+golang.org/x/sync/singleflight

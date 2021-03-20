@@ -1,4 +1,4 @@
-package model
+package stock
 
 // TranslogTCBS is data type of Transaction history in day (lịch sử khớp lệnh)
 type TranslogTCBS struct {

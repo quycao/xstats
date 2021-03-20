@@ -1,4 +1,4 @@
-package model
+package stock
 
 // TranslogBVSC is data type of Transaction history in day (lịch sử khớp lệnh)
 type TranslogBVSC struct {

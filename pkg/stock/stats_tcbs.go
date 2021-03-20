@@ -1,4 +1,4 @@
-package handler
+package stock
 
 import (
 	"encoding/json"
@@ -9,12 +9,10 @@ import (
 	"net/http"
 	"sort"
 	"time"
-
-	"github.com/quycao/xstats/pkg/model"
 )
 
 // StatsTCBS get transaction data of ticker
-func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
+func StatsTCBS(ticker string) (*StatsResultTCBS, error) {
 	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/his", ticker)
 	httpClient := http.Client{Timeout: time.Second * 5}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -32,7 +30,7 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 		return nil, err
 	}
 
-	translogBind := model.TranslogTCBSBind{}
+	translogBind := TranslogTCBSBind{}
 	err = json.Unmarshal(body, &translogBind)
 	if err != nil {
 		return nil, err
@@ -44,18 +42,22 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 		return translogs[i].Vol > translogs[j].Vol
 	})
 
-	result := &model.StatsResultTCBS{}
+	result := &StatsResultTCBS{}
 	if len(translogs) > 0 {
 		fivePct := int64(math.Round(float64(len(translogs)) * 5 / 100))
 		translogs = translogs[:fivePct]
-		var buyVol, selVol int64
+		var buyVol, selVol, totalValue, totalChangeValue int64
 
 		for _, val := range translogs {
 			if err == nil {
 				if val.Action == "BU" {
 					buyVol = buyVol + val.Vol
+					totalValue = totalValue + val.Vol*val.Price
+					totalChangeValue = totalChangeValue + val.Vol*int64(val.ChangePrice)
 				} else if val.Action == "SD" {
 					selVol = selVol + val.Vol
+					totalValue = totalValue + val.Vol*val.Price
+					totalChangeValue = totalChangeValue + val.Vol*int64(val.ChangePrice)
 				}
 			}
 		}
@@ -84,13 +86,19 @@ func StatsTCBS(ticker string) (*model.StatsResultTCBS, error) {
 			}
 		}
 
-		result = &model.StatsResultTCBS{
-			Ticker:     ticker,
-			BuyVol:     buyVol,
-			SellVol:    selVol,
-			BuySellPct: buySellPct,
-			Status:     status,
-			Suggestion: suggestion,
+		avgPrice := totalValue / (buyVol + selVol)
+		avgChangePrice := totalChangeValue / (buyVol + selVol)
+
+		result = &StatsResultTCBS{
+			Time:        time.Now(),
+			Ticker:      ticker,
+			AvgPrice:    avgPrice,
+			ChangePrice: avgChangePrice,
+			BuyVol:      buyVol,
+			SellVol:     selVol,
+			BuySellPct:  buySellPct,
+			Status:      status,
+			Suggestion:  suggestion,
 		}
 
 		return result, nil

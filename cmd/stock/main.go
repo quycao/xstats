@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/quycao/xstats/pkg/handler"
+	"github.com/quycao/xstats/pkg/stock"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	input = strings.ToUpper(input)
 
 	// TCBS
-	result, err := handler.StatsTCBS(input)
+	result, err := stock.StatsTCBS(input)
 	if err != nil {
 		fmt.Println(err)
 	} else {

@@ -1,4 +1,4 @@
-package model
+package stock
 
 // StatsResultBVSC is result of statistic
 type StatsResultBVSC struct {

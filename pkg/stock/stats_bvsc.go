@@ -1,4 +1,4 @@
-package handler
+package stock
 
 import (
 	"encoding/json"
@@ -9,12 +9,10 @@ import (
 	"sort"
 	"strconv"
 	"time"
-
-	"github.com/quycao/xstats/pkg/model"
 )
 
 // StatsBVSC get transaction data of symbol
-func StatsBVSC(symbol string) (*model.StatsResultBVSC, error) {
+func StatsBVSC(symbol string) (*StatsResultBVSC, error) {
 	url := fmt.Sprintf("https://online.bvsc.com.vn/datafeed/translogsnaps/%s", symbol)
 	httpClient := http.Client{Timeout: time.Second * 5}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -32,7 +30,7 @@ func StatsBVSC(symbol string) (*model.StatsResultBVSC, error) {
 		return nil, err
 	}
 
-	translogBind := model.TranslogBVSCBind{}
+	translogBind := TranslogBVSCBind{}
 	err = json.Unmarshal(body, &translogBind)
 	if err != nil {
 		return nil, err
@@ -48,7 +46,7 @@ func StatsBVSC(symbol string) (*model.StatsResultBVSC, error) {
 		return translogs[i].Vol > translogs[j].Vol
 	})
 
-	result := &model.StatsResultBVSC{}
+	result := &StatsResultBVSC{}
 	if len(translogs) >= 0 {
 		fivePct := len(translogs) * 5 / 100
 		translogs = translogs[:fivePct]
@@ -74,7 +72,7 @@ func StatsBVSC(symbol string) (*model.StatsResultBVSC, error) {
 			suggestion = "Bán"
 		}
 
-		result = &model.StatsResultBVSC{
+		result = &StatsResultBVSC{
 			Symbol:     symbol,
 			BuyVol:     buyVol,
 			SellVol:    selVol,
