@@ -50,22 +50,32 @@ func main() {
 	}
 
 	var senders []*tb.User
-	bot.Handle("/hi", func(m *tb.Message) {
+	bot.Handle("/sub", func(m *tb.Message) {
 		senders = append(senders, m.Sender)
-		bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
+		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
+		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
 
 		s := gocron.NewScheduler(time.UTC)
-		s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
+		s.Every(1).Minutes().Tag(m.Payload).Do(statsAndSend, m.Payload, bot, m.Sender)
+		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
+		// s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
+		// s.Every(1).Minutes().Do(statsAndSend, "KNCBUSD", bot, m.Sender)
 		s.StartAsync()
 
-		statsResult, err := crypto.StatsCrypto("BNBBUSD")
-		if err != nil {
-			log.Println(err)
-			bot.Send(m.Sender, err)
-		} else {
-			log.Println(statsResult.ToString())
-			bot.Send(m.Sender, statsResult.ToString())
-		}
+		// statsResult, err := crypto.StatsCrypto("BNBBUSD")
+		// if err != nil {
+		// 	log.Println(err)
+		// 	bot.Send(m.Sender, err)
+		// } else {
+		// 	log.Println(statsResult.ToString())
+		// 	bot.Send(m.Sender, statsResult.ToString())
+		// }
+	})
+
+	bot.Handle("/unsub", func(m *tb.Message) {
+		s := gocron.NewScheduler(time.UTC)
+		s.RemoveByTag(m.Payload)
+		bot.Send(m.Sender, fmt.Sprintf("Your have unfollowed %s", m.Payload))
 	})
 
 	// for _, sender := range senders {
