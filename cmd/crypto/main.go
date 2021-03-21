@@ -86,15 +86,8 @@ func main() {
 
 	bot.Handle(tb.OnText, func(m *tb.Message) {
 		fmt.Println(m.Text)
-		if strings.ToUpper(m.Text) == "BTC" {
-			statsAndSend("BTCBUSD", bot, m.Sender)
-		} else if strings.ToUpper(m.Text) == "ETH" {
-			statsAndSend("ETHBUSD", bot, m.Sender)
-		} else if strings.ToUpper(m.Text) == "BNB" {
-			statsAndSend("BNBBUSD", bot, m.Sender)
-		} else if strings.ToUpper(m.Text) == "KNC" {
-			statsAndSend("KNCBUSD", bot, m.Sender)
-		}
+		input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
+		statsAndSend(input, bot, m.Sender)
 	})
 
 	// for _, sender := range senders {
