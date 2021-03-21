@@ -52,7 +52,8 @@ func main() {
 	var senders []tb.User
 	bot.Handle("/hi", func(m *tb.Message) {
 		senders = append(senders, *m.Sender)
-		bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
+		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
+		statsAndSend("BNB", *bot, *m.Sender)
 	})
 
 	s := gocron.NewScheduler(time.UTC)
