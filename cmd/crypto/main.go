@@ -54,6 +54,10 @@ func main() {
 		senders = append(senders, m.Sender)
 		bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
+		s.StartAsync()
+
 		statsResult, err := crypto.StatsCrypto("BNBBUSD")
 		if err != nil {
 			log.Println(err)
@@ -62,15 +66,12 @@ func main() {
 			log.Println(statsResult.ToString())
 			bot.Send(m.Sender, statsResult.ToString())
 		}
-
-		bot.Send(m.Sender, fmt.Sprintf("Your chat content: %v", m.Payload))
 	})
 
-	s := gocron.NewScheduler(time.UTC)
-	for _, sender := range senders {
-		s.Every(1).Minutes().Do(statsAndSend, "BNB", bot, sender)
-	}
-	s.StartAsync()
+	// for _, sender := range senders {
+	// 	s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, sender)
+	// }
+	// s.StartAsync()
 
 	bot.Start()
 }
