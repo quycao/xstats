@@ -28,7 +28,7 @@ func main() {
 	// s.Every(1).Minutes().Do(stats, input)
 	// s.StartBlocking()
 
-	// stats()
+	// stats("BNB")
 
 	port := os.Getenv("PORT")            // sets automatically
 	publicURL := os.Getenv("PUBLIC_URL") // you must add it to your config vars
@@ -54,7 +54,7 @@ func main() {
 		senders = append(senders, m.Sender)
 		bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 
-		statsResult, err := crypto.StatsCrypto("BNB")
+		statsResult, err := crypto.StatsCrypto("BNBBUSD")
 		if err != nil {
 			log.Println(err)
 			bot.Send(m.Sender, err)
