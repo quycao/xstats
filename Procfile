@@ -1,1 +1,1 @@
-web: xstats
+web: crypto
