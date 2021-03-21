@@ -53,13 +53,13 @@ func main() {
 		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUser '/remove symbol' to unfollow"))
 	})
 
-	var senders []*tb.User
+	// var senders []*tb.User
+	s := gocron.NewScheduler(time.UTC)
 	bot.Handle("/hi", func(m *tb.Message) {
-		senders = append(senders, m.Sender)
+		// senders = append(senders, m.Sender)
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
 
-		s := gocron.NewScheduler(time.UTC)
 		s.Every(1).Minutes().Tag(m.Payload).Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
@@ -77,9 +77,10 @@ func main() {
 	})
 
 	bot.Handle("/remove", func(m *tb.Message) {
-		s := gocron.NewScheduler(time.UTC)
-		s.RemoveByTag(m.Payload)
 		bot.Send(m.Sender, fmt.Sprintf("Your have unfollowed %s", m.Payload))
+		s.Stop()
+		s.RemoveByTag(m.Payload)
+		s.StartAsync()
 	})
 
 	// for _, sender := range senders {
@@ -125,6 +126,8 @@ func statsAndSend(symbol string, bot *tb.Bot, user *tb.User) {
 		bot.Send(user, err)
 	} else {
 		log.Println(statsResult.ToString())
-		bot.Send(user, statsResult.ToString())
+		if statsResult.Suggestion != "Không" {
+			bot.Send(user, statsResult.ToString())
+		}
 	}
 }
