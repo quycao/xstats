@@ -49,11 +49,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var senders []tb.User
+	var senders []*tb.User
 	bot.Handle("/hi", func(m *tb.Message) {
-		senders = append(senders, *m.Sender)
+		senders = append(senders, m.Sender)
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
-		statsAndSend("BNB", bot, m.Sender)
+		statsResult, err := crypto.StatsCrypto("BNB")
+		if err != nil {
+			bot.Send(m.Sender, err)
+		} else {
+			bot.Send(m.Sender, statsResult.ToString())
+		}
 	})
 
 	s := gocron.NewScheduler(time.UTC)
