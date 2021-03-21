@@ -53,7 +53,7 @@ func main() {
 	bot.Handle("/hi", func(m *tb.Message) {
 		senders = append(senders, *m.Sender)
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
-		statsAndSend("BNB", *bot, *m.Sender)
+		statsAndSend("BNB", bot, m.Sender)
 	})
 
 	s := gocron.NewScheduler(time.UTC)
@@ -93,11 +93,11 @@ func stats(symbol string) {
 	// }
 }
 
-func statsAndSend(symbol string, bot tb.Bot, user tb.User) {
+func statsAndSend(symbol string, bot *tb.Bot, user *tb.User) {
 	statsResult, err := crypto.StatsCrypto(symbol)
 	if err != nil {
-		bot.Send(&user, err)
+		bot.Send(user, err)
 	} else {
-		bot.Send(&user, statsResult.ToString())
+		bot.Send(user, statsResult.ToString())
 	}
 }
