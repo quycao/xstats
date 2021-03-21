@@ -83,6 +83,15 @@ func main() {
 		s.StartAsync()
 	})
 
+	bot.Handle(tb.OnText, func(m *tb.Message) {
+		if m.Payload == "hi" {
+			statsAndSend("BTCBUSD", bot, m.Sender)
+			statsAndSend("ETHBUSD", bot, m.Sender)
+			statsAndSend("BNBBUSD", bot, m.Sender)
+			statsAndSend("KNCBUSD", bot, m.Sender)
+		}
+	})
+
 	// for _, sender := range senders {
 	// 	s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, sender)
 	// }
