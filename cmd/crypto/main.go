@@ -53,10 +53,13 @@ func main() {
 	bot.Handle("/hi", func(m *tb.Message) {
 		senders = append(senders, m.Sender)
 		bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
+		bot.Send(m.Sender, fmt.Sprintf("Your chat content: %vd", m.Payload))
 		statsResult, err := crypto.StatsCrypto("BNB")
 		if err != nil {
+			log.Println(err)
 			bot.Send(m.Sender, err)
 		} else {
+			log.Println(statsResult.ToString())
 			bot.Send(m.Sender, statsResult.ToString())
 		}
 	})
