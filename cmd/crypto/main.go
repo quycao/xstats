@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -85,10 +86,13 @@ func main() {
 
 	bot.Handle(tb.OnText, func(m *tb.Message) {
 		fmt.Println(m.Text)
-		if m.Text == "hi" {
+		if strings.ToUpper(m.Text) == "BTC" {
 			statsAndSend("BTCBUSD", bot, m.Sender)
+		} else if strings.ToUpper(m.Text) == "ETH" {
 			statsAndSend("ETHBUSD", bot, m.Sender)
+		} else if strings.ToUpper(m.Text) == "BNB" {
 			statsAndSend("BNBBUSD", bot, m.Sender)
+		} else if strings.ToUpper(m.Text) == "KNC" {
 			statsAndSend("KNCBUSD", bot, m.Sender)
 		}
 	})
