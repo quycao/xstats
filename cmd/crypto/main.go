@@ -84,9 +84,8 @@ func main() {
 	})
 
 	bot.Handle(tb.OnText, func(m *tb.Message) {
-		fmt.Println(m.Payload)
 		fmt.Println(m.Text)
-		if m.Payload == "hi" {
+		if m.Text == "hi" {
 			statsAndSend("BTCBUSD", bot, m.Sender)
 			statsAndSend("ETHBUSD", bot, m.Sender)
 			statsAndSend("BNBBUSD", bot, m.Sender)
