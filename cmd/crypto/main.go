@@ -49,6 +49,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	bot.Handle("/start", func(m *tb.Message) {
+		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUser '/remove symbol' to unfollow"))
+	})
+
 	var senders []*tb.User
 	bot.Handle("/hi", func(m *tb.Message) {
 		senders = append(senders, m.Sender)
