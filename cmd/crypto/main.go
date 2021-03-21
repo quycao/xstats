@@ -61,7 +61,7 @@ func main() {
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
 
-		s.Every(1).Minutes().Tag(m.Payload).Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender)
+		s.Every(1).Minutes().Tag(m.Payload).Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender, true)
 		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "KNCBUSD", bot, m.Sender)
@@ -85,9 +85,13 @@ func main() {
 	})
 
 	bot.Handle(tb.OnText, func(m *tb.Message) {
-		fmt.Println(m.Text)
-		input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
-		statsAndSend(input, bot, m.Sender)
+		if m.Text == "hi" {
+			bot.Send(m.Sender, fmt.Sprint("Hi!\nEnter 'symbol' to get data"))
+		} else {
+			fmt.Println(m.Text)
+			input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
+			statsAndSend(input, bot, m.Sender, false)
+		}
 	})
 
 	// for _, sender := range senders {
@@ -126,14 +130,18 @@ func stats(symbol string) {
 	// }
 }
 
-func statsAndSend(symbol string, bot *tb.Bot, user *tb.User) {
+func statsAndSend(symbol string, bot *tb.Bot, user *tb.User, isActionOnly bool) {
 	statsResult, err := crypto.StatsCrypto(symbol)
 	if err != nil {
 		log.Println(err)
 		bot.Send(user, err)
 	} else {
 		log.Println(statsResult.ToString())
-		if statsResult.Suggestion != "Không" {
+		if isActionOnly {
+			if statsResult.Suggestion != "Không" {
+				bot.Send(user, statsResult.ToString())
+			}
+		} else {
 			bot.Send(user, statsResult.ToString())
 		}
 	}
