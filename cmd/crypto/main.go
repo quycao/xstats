@@ -61,11 +61,10 @@ func main() {
 		// senders = append(senders, m.Sender)
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
-
-		s.Tag(m.Sender.Username+": "+m.Payload).Every(1).Minutes().Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender, true)
+		tag := fmt.Sprintf("%s: %s", m.Sender.Username, m.Payload)
+		symbol := fmt.Sprintf("%sBUSD", strings.ToUpper(m.Payload))
+		s.Tag(tag).Every(1).Minutes().Do(statsAndSend, symbol, bot, m.Sender, true)
 		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
-		// s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
-		// s.Every(1).Minutes().Do(statsAndSend, "KNCBUSD", bot, m.Sender)
 		s.StartAsync()
 
 		// statsResult, err := crypto.StatsCrypto("BNBBUSD")
@@ -106,10 +105,15 @@ func main() {
 	// }
 	// s.StartAsync()
 
+	fmt.Println("Starting bot...")
 	bot.Start()
 
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	fmt.Println("Start server on port: " + port)
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func stats(symbol string) {
