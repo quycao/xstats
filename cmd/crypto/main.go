@@ -50,6 +50,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	bot.Handle("/", func(m *tb.Message) {
+		fmt.Println("Hi!")
+	})
+
 	bot.Handle("/start", func(m *tb.Message) {
 		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUse '/remove symbol' to unfollow\nUse '/list' to get followed symbols"))
 	})
