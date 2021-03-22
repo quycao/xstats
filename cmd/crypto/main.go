@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -61,7 +62,7 @@ func main() {
 		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
 		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
 
-		s.Every(1).Minutes().Tag(m.Payload).Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender, true)
+		s.Tag(m.Sender.Username+": "+m.Payload).Every(1).Minutes().Do(statsAndSend, m.Payload+"BUSD", bot, m.Sender, true)
 		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "BNBBUSD", bot, m.Sender)
 		// s.Every(1).Minutes().Do(statsAndSend, "KNCBUSD", bot, m.Sender)
@@ -79,7 +80,7 @@ func main() {
 
 	bot.Handle("/remove", func(m *tb.Message) {
 		bot.Send(m.Sender, fmt.Sprintf("Your have unfollowed %s", m.Payload))
-		s.Stop()
+		// s.Stop()
 		s.RemoveByTag(m.Payload)
 		s.StartAsync()
 	})
@@ -87,6 +88,12 @@ func main() {
 	bot.Handle(tb.OnText, func(m *tb.Message) {
 		if m.Text == "hi" {
 			bot.Send(m.Sender, fmt.Sprint("Hi!\nEnter 'symbol' to get data"))
+		} else if m.Text == "list" {
+			jobs := ""
+			for _, job := range s.Jobs() {
+				jobs = strings.Join(job.Tags(), "\n")
+			}
+			bot.Send(m.Sender, jobs)
 		} else {
 			fmt.Println(m.Text)
 			input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
@@ -100,6 +107,9 @@ func main() {
 	// s.StartAsync()
 
 	bot.Start()
+
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func stats(symbol string) {
@@ -145,4 +155,8 @@ func statsAndSend(symbol string, bot *tb.Bot, user *tb.User, isActionOnly bool) 
 			bot.Send(user, statsResult.ToString())
 		}
 	}
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi!")
 }
