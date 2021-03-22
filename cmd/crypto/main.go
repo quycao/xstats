@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -60,7 +59,7 @@ func main() {
 		input := strings.ToUpper(m.Payload)
 		tag := fmt.Sprintf("%s: %s", m.Sender.FirstName, input)
 		symbol := fmt.Sprintf("%sBUSD", input)
-		s.Every(1).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
+		s.Every(3).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
 		s.StartAsync()
 		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", input))
 
@@ -85,9 +84,9 @@ func main() {
 		if m.Text == "hi" {
 			bot.Send(m.Sender, fmt.Sprint("Hi!\nEnter 'symbol' to get data"))
 		} else if m.Text == "list" {
-			jobs := ""
+			var jobs string
 			for _, job := range s.Jobs() {
-				jobs = strings.Join(job.Tags(), "\n")
+				jobs = jobs + strings.Join(job.Tags(), ", ") + "\n"
 			}
 			bot.Send(m.Sender, jobs)
 		} else {
@@ -102,15 +101,8 @@ func main() {
 	// }
 	// s.StartAsync()
 
-	fmt.Println("Starting bot...")
 	bot.Start()
-
-	http.HandleFunc("/", handler)
-	fmt.Println("Start server on port: " + port)
-	err = http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println("Bot started")
 }
 
 func stats(symbol string) {
@@ -156,8 +148,4 @@ func statsAndSend(symbol string, bot *tb.Bot, user *tb.User, isActionOnly bool) 
 			bot.Send(user, statsResult.ToString())
 		}
 	}
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi!")
 }
