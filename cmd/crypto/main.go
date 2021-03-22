@@ -51,7 +51,7 @@ func main() {
 	}
 
 	bot.Handle("/start", func(m *tb.Message) {
-		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUser '/remove symbol' to unfollow"))
+		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUse '/remove symbol' to unfollow\nUse '/list' to get followed symbols"))
 	})
 
 	s := gocron.NewScheduler(time.UTC)
@@ -61,7 +61,7 @@ func main() {
 		symbol := fmt.Sprintf("%sBUSD", input)
 		s.Every(3).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
 		s.StartAsync()
-		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", input))
+		bot.Send(m.Sender, fmt.Sprintf("You have followed %s", input))
 
 		// statsResult, err := crypto.StatsCrypto("BNBBUSD")
 		// if err != nil {
@@ -74,21 +74,23 @@ func main() {
 	})
 
 	bot.Handle("/remove", func(m *tb.Message) {
-		bot.Send(m.Sender, fmt.Sprintf("Your have unfollowed %s", m.Payload))
+		bot.Send(m.Sender, fmt.Sprintf("You have unfollowed %s", m.Payload))
 		// s.Stop()
 		s.RemoveByTag(m.Payload)
 		s.StartAsync()
 	})
 
+	bot.Handle("/list", func(m *tb.Message) {
+		var jobs string
+		for _, job := range s.Jobs() {
+			jobs = jobs + strings.Join(job.Tags(), ", ") + "\n"
+		}
+		bot.Send(m.Sender, jobs)
+	})
+
 	bot.Handle(tb.OnText, func(m *tb.Message) {
 		if m.Text == "hi" {
-			bot.Send(m.Sender, fmt.Sprint("Hi!\nEnter 'symbol' to get data"))
-		} else if m.Text == "list" {
-			var jobs string
-			for _, job := range s.Jobs() {
-				jobs = jobs + strings.Join(job.Tags(), ", ") + "\n"
-			}
-			bot.Send(m.Sender, jobs)
+			bot.Send(m.Sender, fmt.Sprint("Hi!\nInput 'symbol' to get data"))
 		} else {
 			fmt.Println(m.Text)
 			input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
