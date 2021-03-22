@@ -59,7 +59,7 @@ func main() {
 		input := strings.ToUpper(m.Payload)
 		tag := fmt.Sprintf("%s: %s", m.Sender.FirstName, input)
 		symbol := fmt.Sprintf("%sBUSD", input)
-		s.Every(3).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
+		s.Every(5).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
 		s.StartAsync()
 		bot.Send(m.Sender, fmt.Sprintf("You have followed %s", input))
 
