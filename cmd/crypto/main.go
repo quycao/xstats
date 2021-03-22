@@ -51,7 +51,7 @@ func main() {
 	}
 
 	bot.Handle("/", func(m *tb.Message) {
-		fmt.Println("Hi!")
+		bot.Send(m.Sender, "Hi!")
 	})
 
 	bot.Handle("/start", func(m *tb.Message) {
