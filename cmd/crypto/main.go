@@ -61,9 +61,13 @@ func main() {
 	s := gocron.NewScheduler(time.UTC)
 	bot.Handle("/hi", func(m *tb.Message) {
 		input := strings.ToUpper(m.Payload)
-		tag := fmt.Sprintf("%s: %s", m.Sender.FirstName, input)
-		symbol := fmt.Sprintf("%sBUSD", input)
-		s.Every(5).Minutes().Tag(tag).Do(statsAndSend, symbol, bot, m.Sender, true)
+		symbols := strings.Split(input, ",")
+		for _, symbol := range symbols {
+			symbol = strings.TrimSpace(symbol)
+			tag := fmt.Sprintf("%s: %s", m.Sender.FirstName, symbol)
+			pair := fmt.Sprintf("%sBUSD", symbol)
+			s.Every(5).Minutes().Tag(tag).Do(statsAndSend, pair, bot, m.Sender, true)
+		}
 		s.StartAsync()
 		bot.Send(m.Sender, fmt.Sprintf("You have followed %s", input))
 
