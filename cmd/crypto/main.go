@@ -55,17 +55,14 @@ func main() {
 		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUser '/remove symbol' to unfollow"))
 	})
 
-	// var senders []*tb.User
 	s := gocron.NewScheduler(time.UTC)
 	bot.Handle("/hi", func(m *tb.Message) {
-		// senders = append(senders, m.Sender)
-		// bot.Send(m.Sender, fmt.Sprintf("Your chat id: %d", m.Chat.ID))
-		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", m.Payload))
-		tag := fmt.Sprintf("%s: %s", m.Sender.Username, m.Payload)
-		symbol := fmt.Sprintf("%sBUSD", strings.ToUpper(m.Payload))
+		input := strings.ToUpper(m.Payload)
+		tag := fmt.Sprintf("%s: %s", m.Sender.FirstName, input)
+		symbol := fmt.Sprintf("%sBUSD", input)
 		s.Tag(tag).Every(1).Minutes().Do(statsAndSend, symbol, bot, m.Sender, true)
-		// s.Every(1).Minutes().Do(statsAndSend, "ETHBUSD", bot, m.Sender)
 		s.StartAsync()
+		bot.Send(m.Sender, fmt.Sprintf("Your have followed %s", input))
 
 		// statsResult, err := crypto.StatsCrypto("BNBBUSD")
 		// if err != nil {
