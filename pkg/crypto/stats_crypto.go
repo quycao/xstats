@@ -173,13 +173,13 @@ func StatsCrypto(symbol string) (*StatsResultCrypto, error) {
 
 		if selVol != 0 && buyVol > selVol {
 			buySellPct = int64((buyVol - selVol) * 100 / selVol)
-			if buySellPct > 100 {
+			if buySellPct >= 100 {
 				status = "Tích luỹ"
 				suggestion = "Mua"
 			}
 		} else if buyVol != 0 && selVol > buyVol {
 			buySellPct = int64((selVol - buyVol) * (-100) / buyVol)
-			if buySellPct < -100 {
+			if buySellPct <= -100 {
 				status = "Phân phối"
 				suggestion = "Bán"
 			}

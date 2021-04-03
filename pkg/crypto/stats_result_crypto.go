@@ -27,9 +27,9 @@ func (r *StatsResultCrypto) ToString() string {
 	// 	r.BuySellPct,
 	// 	r.Status,
 	// 	r.Suggestion)
-
-	return fmt.Sprintf("Time: %s | Symbol: %s | Avg Price: %9v | Buy Vol: %8v | Sell Vol: %8v | Buy/Sell: %5v%% | Status: %11v | Suggestion: %5v\n",
-		r.Time.Format("15:04"),
+	loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+	return fmt.Sprintf("%s | %s | Avg Price: %9v | Buy Vol: %8v | Sell Vol: %8v | Buy/Sell: %5v%% | Status: %11v | Suggestion: %5v\n",
+		r.Time.In(loc).Format("15:04"),
 		r.Symbol,
 		math.Round(r.AvgPrice*100)/100,
 		math.Round(r.BuyVol*100)/100,
