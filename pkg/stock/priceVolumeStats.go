@@ -7,11 +7,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	kz "github.com/wesovilabs/koazee"
+	"github.com/wesovilabs/koazee/stream"
 )
 
 // PriceVolumeStats get price volume data of ticker
 func PriceVolumeStats(ticker string) (*string, error) {
 	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
+	// url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", "PVD")
 	httpClient := http.Client{Timeout: time.Second * 5}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -34,43 +38,49 @@ func PriceVolumeStats(ticker string) (*string, error) {
 		return nil, err
 	}
 
-	pvs := pvBind.Data
+	if len(pvBind.Data) > 32 {
+		pvBind.Data = pvBind.Data[:len(pvBind.Data) - 1]
+		itemCount := len(pvBind.Data)
 
-	if len(pvs) > 0 {
+		//init the loc
+		loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+		timeInLoc := time.Now().In(loc)
+		var pvs stream.Stream
+		if (timeInLoc.Hour() > 9 && timeInLoc.Hour() < 15) {
+			pvs = kz.StreamOf(pvBind.Data[itemCount - 32:itemCount - 1])
+		} else {
+			pvs = kz.StreamOf(pvBind.Data[itemCount - 31:itemCount])
+		}
+
 		// Get Price of last day
-		lastPV := pvs[len(pvs)-1]
+		lastPV := pvs.Last().Val().(*PriceVolume)
 
 		if lastPV.Volume > 99999 {
-			// Get Volumne of 5 last day
-			fiveLastPV := pvs[len(pvs) - 6:len(pvs) - 1]
-			var avgVolume int64 = 0
-			for _, pv := range(fiveLastPV) {
-				avgVolume = avgVolume + pv.Volume
-			}
-			avgVolume = avgVolume/5
+			// Get Volumne of 10 last day
+			tenLastPV := pvs.Take(20, 29).Do()
+			avgVolume := tenLastPV.Reduce(func (acc int64, pv *PriceVolume) int64 {
+				return acc + pv.Volume
+			}).Int64()
+			avgVolume = avgVolume/10
 	
-			// Get max price within 20 days (30 days on calendar)
-			startIdx := 0
-			if startIdx > 21 {
-				startIdx = len(pvs) - 21
-			}
-			thirtyLastPV := pvs[startIdx:len(pvs) - 1]
-			var maxPrice int64 = 0;
-			for _, pv := range(thirtyLastPV) {
-				if pv.Price > maxPrice {
-					maxPrice = pv.Price
+			// Get max price within last 20 days (30 days on calendar)
+			thirtyLastPV := pvs.Take(0, 29).Do()
+			maxPrice := thirtyLastPV.Reduce(func (acc int64, pv *PriceVolume) (int64, error) {
+				if acc < pv.Price {
+					acc = pv.Price
 				}
-			}
+				return acc, nil
+			}).Int64()
 			maxPriceChange := float64(lastPV.Price - maxPrice)/float64(maxPrice)
 	
 			// Buy signal
 			var result string
-			if (lastPV.RatioChangePrice < -0.03 || maxPriceChange < -0.9) && lastPV.Volume > avgVolume {
+			if (lastPV.RatioChangePrice < -0.03 || maxPriceChange < -0.07) && lastPV.Volume > avgVolume {
 				result = "Buy"
 			}
 	
 			// Sell signal
-			if lastPV.ChangePrice > 0 && float64(lastPV.Volume) > float64(avgVolume)*1.5 {
+			if lastPV.RatioChangePrice > 0.03 && float64(lastPV.Volume) > float64(avgVolume)*2 {
 				result = "Sell"
 			}
 			
