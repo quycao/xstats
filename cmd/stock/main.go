@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,11 +11,12 @@ import (
 	tm "github.com/buger/goterm"
 
 	"github.com/quycao/xstats/pkg/stock"
+	"github.com/quycao/xstats/pkg/util"
 )
 
 var inputs = []string{
 	"AAA", "AAM", "AAT", "ABS", "ABT", "ACB", "ACC", "ACL", "ADG", "ADS", "AGD", "AGG", "AGM", "AGR", "AHP", "ALP", "AMD", "ANV", "APC", "APG", "APH", "ASG", "ASM", "ASP", "AST", "ATG",
-	"BAS", "BBC", "BCE", "BCG", "BCI", "BCM", "BFC", "BGM", "BHN", "BHS", "BIC", "BID", "BKG", "BMC", "BMI", "BMP", "BRC", "BSI", "BTP", "BTT", "BVH", "BWE",
+	"BAS", "BBC", "BCE", "BCG", "BCI", "BCM", "BFC", "BGM", "BHN", "BIC", "BID", "BKG", "BMC", "BMI", "BMP", "BRC", "BSI", "BTP", "BTT", "BVH", "BWE",
 	"C32", "C47", "CAV", "CCI", "CCL", "CDC", "CEE", "CHP", "CIG", "CII", "CKG", "CLC", "CLG", "CLL", "CLP", "CLW", "CMG", "CMV", "CMX", "CNG", "COM", "CRC", "CRE", "CSG", "CSM", "CSV", "CTD", "CTF", "CTG", "CTI", "CTS", "CVT",
 	"D2D", "DAG", "DAH", "DAT", "DBC", "DBD", "DBT", "DC4", "DCC", "DCL", "DCM", "DGC", "DGW", "DHA", "DHC", "DHG", "DHM", "DIG", "DLG", "DMC", "DPG", "DPM", "DPR", "DQC", "DRC", "DRH", "DRL", "DSN", "DTA", "DTL", "DTT", "DVD", "DVP", "DXG", "DXV",
 	"EIB", "ELC", "EMC", "EVE", "EVG", "FBT", "FCM", "FCN", "FDC", "FIR", "FIT", "FLC", "FMC", "FPC", "FPT", "FRT", "FTM", "FTS",
@@ -30,6 +32,11 @@ var inputs = []string{
 	"UDC", "UIC", "VAF", "VCB", "VCF", "VCG", "VCI", "VDP", "VDS", "VFG", "VGC", "VHC", "VHM", "VIB", "VIC", "VID", "VIP", "VIS", "VIX", "VJC", "VMD", "VND", "VNE", "VNG", "VNL", "VNM", "VNS", "VOS", "VPB", "VPD", "VPG", "VPH", "VPI", "VPL", "VPS", "VRC", "VRE", "VSC", "VSH", "VSI", "VTB", "VTF", "VTO", "YBM", "YEG"}
 
 func main() {
+	// Get arguments
+	symbol := flag.String("symbol", "", "Symbol that you want to get stats detail")
+	daysBefore := flag.Int("day", 0, "0: today, -n: n days before")
+	flag.Parse()
+
 	// qs := &survey.Select{
 	// 	Message: "Choose function:",
 	// 	Options: []string{"Volume Price analyse"},
@@ -43,72 +50,71 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	priceVolumeAnalyse()
+	// *symbol = "KDH"
+	// *daysBefore = -1
+	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 
-func priceVolumeAnalyse() {
-	tm.Clear() // Clear current screen
-	var sellList []string
-	var buyList []string
-	for _, input := range inputs {
-		// remove the delimeter from the string
-		input = strings.TrimSuffix(input, "\n")
-		input = strings.ToUpper(input)
-		pvStats, err := stock.PriceVolumeStats(input)
-		if err != nil {
-			continue
-		} else if pvStats != nil {
-			var isUpdated bool
-			if *pvStats == "Buy" {
-				isUpdated = true
-				buyList = append(buyList, input)
-				// fmt.Printf("\r\033[ABuy: %s\n", strings.Join(buyList, " "))
+func priceVolumeAnalyse(symbol string, daysBefore int) {
+	if daysBefore > 0 {
+		daysBefore = -1 * daysBefore
+	}
 
-			} else if *pvStats == "Sell" {
-				isUpdated = true
-				sellList = append(sellList, input)
-				// fmt.Printf("\rSell: %s", strings.Join(sellList, " "))
-			}
+	if len(symbol) == 0 {
+		tm.Clear() // Clear current screen
+		var sellList []string
+		var buyList []string
+		for _, input := range inputs {
+			// remove the delimeter from the string
+			input = strings.TrimSuffix(input, "\n")
+			input = strings.ToUpper(input)
+			pvStatsResult, err := stock.PriceVolumeStats(input, daysBefore)
+			if err != nil {
+				continue
+			} else if pvStatsResult != nil {
+				var isUpdated bool
+				if pvStatsResult.Suggestion == "Buy" {
+					isUpdated = true
+					buyList = append(buyList, input)
+					// fmt.Printf("\r\033[ABuy: %s\n", strings.Join(buyList, " "))
 
-			if isUpdated {
-				tm.MoveCursor(1, 1)
-				// Create Box with 30% width of current screen, and height of 20 lines
-				buyBox := tm.NewBox(50|tm.PCT, 20, 0)
-				sellBox := tm.NewBox(50|tm.PCT, 20, 0)
+				} else if pvStatsResult.Suggestion == "Sell" {
+					isUpdated = true
+					sellList = append(sellList, input)
+					// fmt.Printf("\rSell: %s", strings.Join(sellList, " "))
+				}
 
-				// Add some content to the box
-				// Note that you can add ANY content, even tables
-				fmt.Fprint(buyBox, word_wrap(fmt.Sprintf("Buy: %s", strings.Join(buyList, " ")), buyBox.Width-4))
-				fmt.Fprint(sellBox, word_wrap(fmt.Sprintf("Sell: %s", strings.Join(sellList, " ")), sellBox.Width-4))
+				if isUpdated {
+					tm.MoveCursor(1, 1)
+					// Create Box with 30% width of current screen, and height of 20 lines
+					buyBox := tm.NewBox(50|tm.PCT, 20, 5)
+					sellBox := tm.NewBox(50|tm.PCT, 20, 5)
 
-				// Move Box to approx position of the screen
-				tm.Print(tm.MoveTo(buyBox.String(), 0|tm.PCT, 0|tm.PCT))
-				tm.Print(tm.MoveTo(sellBox.String(), 50|tm.PCT, 0|tm.PCT))
+					// Add some content to the box
+					// Note that you can add ANY content, even tables
+					buyStr := fmt.Sprintf("Buy: %s", strings.Join(buyList, " "))
+					sellStr := fmt.Sprintf("Sell: %s", strings.Join(sellList, " "))
+					fmt.Fprint(buyBox, fmt.Sprintf("Date: %s\n\n%s", pvStatsResult.Date, util.WordWrap(buyStr, buyBox.Width-4)))
+					fmt.Fprint(sellBox, fmt.Sprintf("Date: %s\n\n%s", pvStatsResult.Date, util.WordWrap(sellStr, sellBox.Width-4)))
 
-				tm.Flush()
+					// Move Box to approx position of the screen
+					tm.Print(tm.MoveTo(buyBox.String(), 0|tm.PCT, 0|tm.PCT))
+					tm.Print(tm.MoveTo(sellBox.String(), 50|tm.PCT, 0|tm.PCT))
+
+					tm.Flush()
+				}
 			}
 		}
-	}
-}
-
-func word_wrap(text string, lineWidth int) string {
-	words := strings.Fields(strings.TrimSpace(text))
-	if len(words) == 0 {
-		return text
-	}
-	wrapped := words[0]
-	spaceLeft := lineWidth - len(wrapped)
-	for _, word := range words[1:] {
-		if len(word)+1 > spaceLeft {
-			wrapped += "\n" + word
-			spaceLeft = lineWidth - len(word)
+	} else {
+		symbol = strings.TrimSuffix(symbol, "\n")
+		symbol = strings.ToUpper(symbol)
+		pvStatsResult, err := stock.PriceVolumeStats(symbol, daysBefore)
+		if err == nil {
+			fmt.Println(pvStatsResult.ToString())
 		} else {
-			wrapped += " " + word
-			spaceLeft -= 1 + len(word)
+			fmt.Println(err)
 		}
 	}
-
-	return wrapped
 }
 
 func main2() {
