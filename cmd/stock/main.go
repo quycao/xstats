@@ -50,8 +50,8 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	*symbol = "FCM"
-	*daysBefore = -7
+	// *symbol = "FCM"
+	// *daysBefore = -7
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 
