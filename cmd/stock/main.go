@@ -50,8 +50,8 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	// *symbol = "KDH"
-	// *daysBefore = -1
+	*symbol = "FCM"
+	*daysBefore = -7
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 
@@ -105,6 +105,7 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 				}
 			}
 		}
+		fmt.Println()
 	} else {
 		symbol = strings.TrimSuffix(symbol, "\n")
 		symbol = strings.ToUpper(symbol)

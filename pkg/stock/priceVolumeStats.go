@@ -88,6 +88,8 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				}
 				return acc, nil
 			}).Int64()
+			avgVolumeChange := float64(lastPV.Volume - avgVolume)/float64(avgVolume)
+			avgVolumeChange = math.Round(avgVolumeChange*10000)/10000
 			maxPriceChange := float64(lastPV.Price - maxPrice)/float64(maxPrice)
 			maxPriceChange = math.Round(maxPriceChange*10000)/10000
 
@@ -97,6 +99,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				Volume: lastPV.Volume,
 				AvgVolume10Days: avgVolume,
 				HighestPrice30Days: maxPrice,
+				RatioChangeVol10Days: avgVolumeChange,
 				RatioChangePrice30Days: maxPriceChange,
 				RatioChangePrice: lastPV.RatioChangePrice,
 				Date: lastPV.Date,
@@ -104,18 +107,26 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 			}
 	
 			// Buy signal
-			if (lastPV.RatioChangePrice < -0.03 || maxPriceChange < -0.07) && lastPV.Volume > avgVolume {
+			if (lastPV.RatioChangePrice <= -0.03 || maxPriceChange <= -0.07) && lastPV.Volume >= avgVolume {
 				result.Suggestion = "Buy"
 			}
 	
 			// Sell signal
-			if lastPV.RatioChangePrice > 0.03 && float64(lastPV.Volume) > float64(avgVolume)*2 {
+			if lastPV.RatioChangePrice >= 0.03 && float64(lastPV.Volume) >= float64(avgVolume)*2 {
 				result.Suggestion = "Sell"
 			}
 			
 			return result, nil
+		} else {
+			result := &PriceVolumeStatsResult{
+				Ticker: ticker,
+				Price: lastPV.Price,
+				Volume: lastPV.Volume,
+				Date: lastPV.Date,
+				Suggestion: "None - Volume too small",
+			}
+			return result, nil
 		}
-		return nil, nil
 	} else {
 		return nil, errors.New("There are no translog records of " + ticker)
 	}
