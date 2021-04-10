@@ -51,7 +51,7 @@ func main() {
 	// }
 
 	// *symbol = "FCM"
-	// *daysBefore = -7
+	// *daysBefore = -15
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 

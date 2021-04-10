@@ -39,7 +39,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 		return nil, err
 	}
 
-	if len(pvBind.Data) > 32 {
+	if len(pvBind.Data) > 32 - daysBefore {
 		pvData := pvBind.Data
 
 		// Get Price of last day
