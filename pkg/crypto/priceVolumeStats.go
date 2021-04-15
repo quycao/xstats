@@ -114,6 +114,15 @@ func PriceVolumeStats(symbol string, interval string, periodsBefore int) (*Price
 		priceChange := (lastPV.ClosePrice - secondLastPV.ClosePrice) / secondLastPV.ClosePrice
 		// priceChange = math.Round(priceChange*10000)/10000
 
+		direction := "sideway"
+		firstTenPV := tenLastPV.First().Val().(*PriceVolume)
+
+		if (secondLastPV.ClosePrice-firstTenPV.ClosePrice)/firstTenPV.ClosePrice >= 0.02 {
+			direction = "up"
+		} else if (secondLastPV.ClosePrice-firstTenPV.ClosePrice)/firstTenPV.ClosePrice <= -0.02 {
+			direction = "down"
+		}
+
 		result := &PriceVolumeStatsResult{
 			Symbol:                    symbol,
 			Period:                    interval,
@@ -144,12 +153,12 @@ func PriceVolumeStats(symbol string, interval string, periodsBefore int) (*Price
 		}
 
 		// Buy signal
-		if (result.RatioChangePrice <= -1*priceChangeRatio || maxPriceChange <= -1*maxPriceChangeRatio) && lastPV.Volume >= avgVolume {
+		if direction != "up" && (result.RatioChangePrice <= -1*priceChangeRatio || maxPriceChange <= -1*maxPriceChangeRatio) && lastPV.Volume >= avgVolume*2 {
 			result.Suggestion = "Buy"
 		}
 
 		// Sell signal
-		if result.RatioChangePrice >= priceChangeRatio && float64(lastPV.Volume) >= float64(avgVolume)*2 {
+		if direction == "up" && result.RatioChangePrice >= priceChangeRatio && lastPV.Volume >= avgVolume*2 {
 			result.Suggestion = "Sell"
 		}
 

@@ -12,8 +12,8 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-func main() {
-	result, err := crypto.PriceVolumeStats("BNBBUSD", "15m", -14)
+func main1() {
+	result, err := crypto.PriceVolumeStats("BNBBUSD", "1h", -14)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -21,7 +21,7 @@ func main() {
 	}
 }
 
-func main1() {
+func main() {
 	// fmt.Print("Input ticker symbol: ")
 	// reader := bufio.NewReader(os.Stdin)
 	// // ReadString will block until the delimiter is entered
@@ -153,7 +153,8 @@ func stats(symbol string) {
 }
 
 func statsAndSend(symbol string, bot *tb.Bot, user *tb.User, isActionOnly bool) {
-	statsResult, err := crypto.StatsCrypto(symbol)
+	// statsResult, err := crypto.StatsCrypto(symbol)
+	statsResult, err := crypto.PriceVolumeStats(symbol, "1h", 0)
 	if err != nil {
 		log.Println(err)
 		bot.Send(user, err)
