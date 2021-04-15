@@ -13,6 +13,15 @@ import (
 )
 
 func main() {
+	result, err := crypto.PriceVolumeStats("BNBBUSD", "15m", -14)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(result.ToString())
+	}
+}
+
+func main1() {
 	// fmt.Print("Input ticker symbol: ")
 	// reader := bufio.NewReader(os.Stdin)
 	// // ReadString will block until the delimiter is entered

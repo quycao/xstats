@@ -128,6 +128,6 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 			return result, nil
 		}
 	} else {
-		return nil, errors.New("There are no translog records of " + ticker)
+		return nil, errors.New("There are not enough translog records of " + ticker)
 	}
 }
