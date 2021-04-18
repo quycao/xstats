@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	tb "github.com/quycao/telebot"
 	"github.com/quycao/xstats/pkg/crypto"
-	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 func main1() {
@@ -110,7 +110,6 @@ func main() {
 		if m.Text == "hi" {
 			bot.Send(m.Sender, fmt.Sprint("Hi!\nInput 'symbol' to get data"))
 		} else {
-			fmt.Println(m.Text)
 			input := strings.ToUpper(fmt.Sprintf("%sBUSD", m.Text))
 			statsAndSend(input, bot, m.Sender, false)
 		}
