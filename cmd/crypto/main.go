@@ -122,13 +122,13 @@ func main() {
 	// s.StartAsync()
 
 	// Start a web server in other go routine
-	go func() {
-		mux := http.NewServeMux()
-		mux.HandleFunc("/home", home)
-		fmt.Printf("Starting server on :%s\n", port)
-		err := http.ListenAndServe(":"+port, mux)
-		fmt.Println(err)
-	}()
+	// go func() {
+	// 	mux := http.NewServeMux()
+	// 	mux.HandleFunc("/home", home)
+	// 	fmt.Printf("Starting server on :%s\n", port)
+	// 	err := http.ListenAndServe(":"+port, mux)
+	// 	fmt.Println(err)
+	// }()
 
 	bot.Start()
 	fmt.Println("Bot started")
