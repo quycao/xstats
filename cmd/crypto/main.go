@@ -64,11 +64,6 @@ func main() {
 	// 	bot.Send(m.Sender, "Hi!")
 	// })
 
-	bot.Handle("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Welcome to x-stats bot")
-		fmt.Fprintf(w, "Welcome to x-stats bot")
-	})
-
 	bot.Handle("/start", func(m *tb.Message) {
 		bot.Send(m.Sender, fmt.Sprint("Hi!\nUse '/hi symbol' to follow\nUse '/remove symbol' to unfollow\nUse '/list' to get followed symbols"))
 	})
@@ -126,8 +121,21 @@ func main() {
 	// }
 	// s.StartAsync()
 
+	// Start a web server in other go routine
+	go func() {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", home)
+		fmt.Println("Starting server on :81")
+		err := http.ListenAndServe(":81", mux)
+		fmt.Println(err)
+	}()
+
 	bot.Start()
 	fmt.Println("Bot started")
+}
+
+func home(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello from Snippetbox"))
 }
 
 func stats(symbol string) {
