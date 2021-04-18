@@ -65,6 +65,7 @@ func main() {
 	// })
 
 	bot.Handle("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Welcome to x-stats bot")
 		fmt.Fprintf(w, "Welcome to x-stats bot")
 	})
 
