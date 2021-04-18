@@ -125,7 +125,7 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 		mux.HandleFunc("/home", home)
-		fmt.Printf("Starting server on :%s\n" + port)
+		fmt.Printf("Starting server on :%s\n", port)
 		err := http.ListenAndServe(":"+port, mux)
 		fmt.Println(err)
 	}()
