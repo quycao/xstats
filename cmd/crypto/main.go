@@ -124,9 +124,9 @@ func main() {
 	// Start a web server in other go routine
 	go func() {
 		mux := http.NewServeMux()
-		mux.HandleFunc("/", home)
-		fmt.Println("Starting server on :81")
-		err := http.ListenAndServe(":81", mux)
+		mux.HandleFunc("/home", home)
+		fmt.Println("Starting server on :80")
+		err := http.ListenAndServe(":80", mux)
 		fmt.Println(err)
 	}()
 
