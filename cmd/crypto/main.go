@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -13,7 +14,7 @@ import (
 )
 
 func main1() {
-	result, err := crypto.PriceVolumeStats("BNBBUSD", "1h", -14)
+	result, err := crypto.PriceVolumeStats("BNBBUSD", "1h", -1)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -59,8 +60,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot.Handle("/", func(m *tb.Message) {
-		bot.Send(m.Sender, "Hi!")
+	// bot.Handle("/", func(m *tb.Message) {
+	// 	bot.Send(m.Sender, "Hi!")
+	// })
+
+	bot.Handle("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Welcome to x-stats bot")
 	})
 
 	bot.Handle("/start", func(m *tb.Message) {
