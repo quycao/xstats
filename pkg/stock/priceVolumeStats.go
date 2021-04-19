@@ -96,9 +96,9 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 
 			direction := "Sideway"
 			firstTenPV := tenLastPV.First().Val().(*PriceVolume)
-			if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) >= 0.1 {
+			if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) >= 0.09 {
 				direction = "Up"
-			} else if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) <= -0.1 {
+			} else if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) <= -0.09 {
 				direction = "Down"
 			}
 
