@@ -106,6 +106,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				Ticker:                 ticker,
 				Price:                  lastPV.Price,
 				Volume:                 lastPV.Volume,
+				Trend:                  direction,
 				AvgVolume10Days:        avgVolume,
 				HighestPrice30Days:     maxPrice,
 				RatioChangeVol10Days:   avgVolumeChange,

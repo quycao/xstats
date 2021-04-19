@@ -18,6 +18,7 @@ type PriceVolumeStatsResult struct {
 	Ticker                 string  `json:"ticker"`
 	Price                  int64   `json:"price"`
 	Volume                 int64   `json:"volume"`
+	Trend                  string  `json:"trend"`
 	AvgVolume10Days        int64   `json:"avg_volume_10_days"`
 	HighestPrice30Days     int64   `json:"highest_price_30_days"`
 	RatioChangeVol10Days   float64 `json:"ratio_change_vol_10_days"`
@@ -39,6 +40,7 @@ func (r *PriceVolumeStatsResult) ToString() string {
 		Symbol: %s
 		Price: %d
 		Volume: %d
+		Trend: %s
 		Avg Volume: %d
 		Highest Price: %d
 		Change Volume 10 days: %.2f%%
@@ -50,6 +52,7 @@ func (r *PriceVolumeStatsResult) ToString() string {
 		r.Ticker,
 		r.Price,
 		r.Volume,
+		r.Trend,
 		r.AvgVolume10Days,
 		r.HighestPrice30Days,
 		r.RatioChangeVol10Days*100,
