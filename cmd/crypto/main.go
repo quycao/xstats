@@ -99,11 +99,15 @@ func main() {
 	})
 
 	bot.Handle("/list", func(m *tb.Message) {
-		var jobs string
-		for _, job := range s.Jobs() {
-			jobs = jobs + strings.Join(job.Tags(), ", ") + "\n"
+		if len(s.Jobs()) > 0 {
+			var jobs string
+			for _, job := range s.Jobs() {
+				jobs = jobs + strings.Join(job.Tags(), ", ") + "\n"
+			}
+			bot.Send(m.Sender, jobs)
+		} else {
+			bot.Send(m.Sender, "You don't follow any symbol")
 		}
-		bot.Send(m.Sender, jobs)
 	})
 
 	bot.Handle(tb.OnText, func(m *tb.Message) {
