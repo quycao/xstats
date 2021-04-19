@@ -94,12 +94,17 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 			maxPriceChange := float64(lastPV.Price-maxPrice) / float64(maxPrice)
 			maxPriceChange = math.Round(maxPriceChange*10000) / 10000
 
+			maxPriceTenDays := tenLastPV.Reduce(func(acc int64, pv *PriceVolume) (int64, error) {
+				if acc < pv.Price {
+					acc = pv.Price
+				}
+				return acc, nil
+			}).Int64()
 			direction := "Sideway"
-			firstTenPV := tenLastPV.First().Val().(*PriceVolume)
-			priceChangeTenDays := float64(secondLastPV.Price-firstTenPV.Price) / float64(firstTenPV.Price)
-			if priceChangeTenDays >= 0.06 {
+			priceChangeTenDays := float64(maxPriceTenDays-lastPV.Price) / float64(maxPriceTenDays)
+			if priceChangeTenDays > -0.027 {
 				direction = "Up"
-			} else if priceChangeTenDays <= -0.06 {
+			} else if priceChangeTenDays < -0.06 {
 				direction = "Down"
 			}
 
@@ -122,8 +127,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				result.Suggestion = "Buy"
 			} else if direction == "Sideway" && (lastPV.RatioChangePrice <= -0.027 || maxPriceChange <= -0.07) && lastPV.Volume >= avgVolume {
 				result.Suggestion = "Buy"
-			}
-
+			} else
 			// Sell signal
 			if direction == "Up" && lastPV.RatioChangePrice >= 0.027 && float64(lastPV.Volume) >= float64(avgVolume)*1.5 {
 				result.Suggestion = "Sell"
