@@ -69,7 +69,7 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	// *symbol = "ROS"
+	// *symbol = "D2D"
 	// *daysBefore = -15
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
