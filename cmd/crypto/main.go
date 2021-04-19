@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	tb "github.com/quycao/telebot"
 	"github.com/quycao/xstats/pkg/crypto"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 func main1() {
@@ -174,7 +174,7 @@ func statsAndSend(symbol string, bot *tb.Bot, user *tb.User, isActionOnly bool) 
 	} else {
 		log.Println(statsResult.ToString())
 		if isActionOnly {
-			if statsResult.Suggestion != "Không" {
+			if statsResult.Suggestion != "None" {
 				bot.Send(user, statsResult.ToString())
 			}
 		} else {

@@ -158,7 +158,7 @@ func PriceVolumeStats(symbol string, interval string, periodsBefore int) (*Price
 		}
 
 		// Sell signal
-		if direction == "up" && result.RatioChangePrice >= priceChangeRatio && lastPV.Volume >= avgVolume*2 {
+		if direction == "up" && result.RatioChangePrice >= priceChangeRatio && lastPV.Volume >= avgVolume*1.5 {
 			result.Suggestion = "Sell"
 		}
 

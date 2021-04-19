@@ -39,25 +39,26 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 		return nil, err
 	}
 
-	if len(pvBind.Data) > 32 - daysBefore {
+	if len(pvBind.Data) > 32-daysBefore {
 		pvData := pvBind.Data
 
 		// Get Price of last day
-		lastPV := pvData[len(pvData) - 1]
-		secondLastPV := pvData[len(pvData) - 2]
-		
+		lastPV := pvData[len(pvData)-1]
+		secondLastPV := pvData[len(pvData)-2]
+
 		if strings.Split(lastPV.Date, " ")[0] == strings.Split(secondLastPV.Date, " ")[0] {
-			pvData = pvData[:len(pvData) - 1]
+			pvData = pvData[:len(pvData)-1]
 		}
 
 		// Get data of n days before if daysBefore is specify
-		pvData = pvData[:len(pvData) + daysBefore]
+		pvData = pvData[:len(pvData)+daysBefore]
 
 		// Update lastPV after change pvData
-		lastPV = pvData[len(pvData) - 1]
+		lastPV = pvData[len(pvData)-1]
+		secondLastPV = pvData[len(pvData)-2]
 
 		// Get data of last 30 days before last date
-		pvData = pvData[len(pvData) - 31:len(pvData) - 1]
+		pvData = pvData[len(pvData)-31 : len(pvData)-1]
 
 		// //init the loc
 		// loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
@@ -75,54 +76,62 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 		if lastPV.Volume > 99999 {
 			// Get Volumne of 10 last day
 			tenLastPV := pvs.Take(20, 29).Do()
-			avgVolume := tenLastPV.Reduce(func (acc int64, pv *PriceVolume) int64 {
+			avgVolume := tenLastPV.Reduce(func(acc int64, pv *PriceVolume) int64 {
 				return acc + pv.Volume
 			}).Int64()
-			avgVolume = avgVolume/10
-	
+			avgVolume = avgVolume / 10
+
 			// Get max price within last 20 days (30 days on calendar)
 			thirtyLastPV := pvs.Take(0, 29).Do()
-			maxPrice := thirtyLastPV.Reduce(func (acc int64, pv *PriceVolume) (int64, error) {
+			maxPrice := thirtyLastPV.Reduce(func(acc int64, pv *PriceVolume) (int64, error) {
 				if acc < pv.Price {
 					acc = pv.Price
 				}
 				return acc, nil
 			}).Int64()
-			avgVolumeChange := float64(lastPV.Volume - avgVolume)/float64(avgVolume)
-			avgVolumeChange = math.Round(avgVolumeChange*10000)/10000
-			maxPriceChange := float64(lastPV.Price - maxPrice)/float64(maxPrice)
-			maxPriceChange = math.Round(maxPriceChange*10000)/10000
+			avgVolumeChange := float64(lastPV.Volume-avgVolume) / float64(avgVolume)
+			avgVolumeChange = math.Round(avgVolumeChange*10000) / 10000
+			maxPriceChange := float64(lastPV.Price-maxPrice) / float64(maxPrice)
+			maxPriceChange = math.Round(maxPriceChange*10000) / 10000
+
+			direction := "sideway"
+			firstTenPV := tenLastPV.First().Val().(*PriceVolume)
+			if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) >= 0.02 {
+				direction = "up"
+			} else if float64(secondLastPV.Price-firstTenPV.Price)/float64(firstTenPV.Price) <= -0.02 {
+				direction = "down"
+			}
 
 			result := &PriceVolumeStatsResult{
-				Ticker: ticker,
-				Price: lastPV.Price,
-				Volume: lastPV.Volume,
-				AvgVolume10Days: avgVolume,
-				HighestPrice30Days: maxPrice,
-				RatioChangeVol10Days: avgVolumeChange,
+				Ticker:                 ticker,
+				Price:                  lastPV.Price,
+				Volume:                 lastPV.Volume,
+				AvgVolume10Days:        avgVolume,
+				HighestPrice30Days:     maxPrice,
+				RatioChangeVol10Days:   avgVolumeChange,
 				RatioChangePrice30Days: maxPriceChange,
-				RatioChangePrice: lastPV.RatioChangePrice,
-				Date: lastPV.Date,
-				Suggestion: "None",
+				RatioChangePrice:       lastPV.RatioChangePrice,
+				Date:                   lastPV.Date,
+				Suggestion:             "None",
 			}
-	
+
 			// Buy signal
-			if (lastPV.RatioChangePrice <= -0.03 || maxPriceChange <= -0.07) && lastPV.Volume >= avgVolume {
+			if direction != "up" && (lastPV.RatioChangePrice <= -0.027 || maxPriceChange <= -0.07) && lastPV.Volume >= avgVolume {
 				result.Suggestion = "Buy"
 			}
-	
+
 			// Sell signal
-			if lastPV.RatioChangePrice >= 0.03 && float64(lastPV.Volume) >= float64(avgVolume)*2 {
+			if direction == "up" && lastPV.RatioChangePrice >= 0.027 && float64(lastPV.Volume) >= float64(avgVolume)*1.5 {
 				result.Suggestion = "Sell"
 			}
-			
+
 			return result, nil
 		} else {
 			result := &PriceVolumeStatsResult{
-				Ticker: ticker,
-				Price: lastPV.Price,
-				Volume: lastPV.Volume,
-				Date: lastPV.Date,
+				Ticker:     ticker,
+				Price:      lastPV.Price,
+				Volume:     lastPV.Volume,
+				Date:       lastPV.Date,
 				Suggestion: "None - Volume too small",
 			}
 			return result, nil
