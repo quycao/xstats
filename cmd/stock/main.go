@@ -15,6 +15,7 @@ import (
 )
 
 var inputs = []string{
+	// HOSE
 	"AAA", "AAM", "AAT", "ABS", "ABT", "ACB", "ACC", "ACL", "ADG", "ADS", "AGD", "AGG", "AGM", "AGR", "AHP", "ALP", "AMD", "ANV", "APC", "APG", "APH", "ASG", "ASM", "ASP", "AST", "ATG",
 	"BAS", "BBC", "BCE", "BCG", "BCI", "BCM", "BFC", "BGM", "BHN", "BIC", "BID", "BKG", "BMC", "BMI", "BMP", "BRC", "BSI", "BTP", "BTT", "BVH", "BWE",
 	"C32", "C47", "CAV", "CCI", "CCL", "CDC", "CEE", "CHP", "CIG", "CII", "CKG", "CLC", "CLG", "CLL", "CLP", "CLW", "CMG", "CMV", "CMX", "CNG", "COM", "CRC", "CRE", "CSG", "CSM", "CSV", "CTD", "CTF", "CTG", "CTI", "CTS", "CVT",
@@ -29,7 +30,25 @@ var inputs = []string{
 	"RAL", "RDP", "REE", "RIC", "ROS",
 	"S4A", "SAB", "SAM", "SAV", "SBA", "SBC", "SBT", "SBV", "SC5", "SCD", "SCR", "SCS", "SEC", "SFC", "SFG", "SFI", "SGN", "SGR", "SGT", "SHA", "SHI", "SHP", "SII", "SJD", "SJF", "SJS", "SKG", "SMA", "SMB", "SMC", "SPM", "SRC", "SRF", "SSC", "SSI", "ST8", "STB", "STG", "STK", "SVC", "SVD", "SVI", "SVT", "SZC", "SZL",
 	"TAC", "TBC", "TCB", "TCD", "TCH", "TCL", "TCM", "TCO", "TCR", "TCT", "TDC", "TDG", "TDH", "TDM", "TDP", "TDW", "TEG", "TGG", "THG", "THI", "TIC", "TIP", "TIX", "TLD", "TLG", "TLH", "TMP", "TMS", "TMT", "TN1", "TNA", "TNC", "TNH", "TNI", "TNT", "TPB", "TPC", "TRA", "TRC", "TRI", "TS4", "TSC", "TTA", "TTB", "TTE", "TTF", "TV2", "TVB", "TVS", "TVT", "TYA",
-	"UDC", "UIC", "VAF", "VCB", "VCF", "VCG", "VCI", "VDP", "VDS", "VFG", "VGC", "VHC", "VHM", "VIB", "VIC", "VID", "VIP", "VIS", "VIX", "VJC", "VMD", "VND", "VNE", "VNG", "VNL", "VNM", "VNS", "VOS", "VPB", "VPD", "VPG", "VPH", "VPI", "VPL", "VPS", "VRC", "VRE", "VSC", "VSH", "VSI", "VTB", "VTF", "VTO", "YBM", "YEG"}
+	"UDC", "UIC", "VAF", "VCB", "VCF", "VCG", "VCI", "VDP", "VDS", "VFG", "VGC", "VHC", "VHM", "VIB", "VIC", "VID", "VIP", "VIS", "VIX", "VJC", "VMD", "VND", "VNE", "VNG", "VNL", "VNM", "VNS", "VOS", "VPB", "VPD", "VPG", "VPH", "VPI", "VPL", "VPS", "VRC", "VRE", "VSC", "VSH", "VSI", "VTB", "VTF", "VTO", "YBM", "YEG",
+
+	// HNX
+	"AAV", "ACM", "ADC", "AGC", "ALT", "AMC", "AME", "AMV", "API", "APP", "APS", "ARM", "ART", "ATS", "AVS",
+	"BAB", "BAX", "BBS", "BCC", "BCF", "BDB", "BED", "BII", "BKC", "BLF", "BNA", "BPC", "BSC", "BST", "BTS", "BTW", "BVS", "BXH",
+	"C69", "C92", "CAG", "CAN", "CAP", "CDN", "CEO", "CET", "CIA", "CIC", "CJC", "CKV", "CLH", "CLM", "CMC", "CMS", "CPC", "CSC", "CTB", "CTC", "CTM", "CTP", "CTT", "CTV", "CTX", "CVN", "CX8",
+	"D11", "DAD", "DAE", "DC2", "DDG", "DGL", "DHI", "DHL", "DHP", "DHT", "DIH", "DL1", "DNC", "DNM", "DNP", "DP3", "DPC", "DPS", "DS3", "DST", "DTD", "DTK", "DVG", "DXP", "DZM",
+	"EBA", "EBS", "ECI", "EID", "EVS", "FDT", "FID", "FTV", "GBS", "GDW", "GFC", "GHA", "GIC", "GKM", "GLT", "GMA", "GMX",
+	"HAD", "HAT", "HBB", "HBE", "HBS", "HCC", "HCT", "HDA", "HEV", "HGM", "HHC", "HHG", "HHL", "HJS", "HKB", "HKT", "HLC", "HLD", "HLY", "HMH", "HNM", "HOM", "HPC", "HPM", "HPR", "HPS", "HSC", "HST", "HTB", "HTC", "HTP", "HUT", "HVT",
+	"ICG", "IDC", "IDJ", "IDV", "INC", "INN", "ITQ", "IVS", "KBT", "KDM", "KHS", "KKC", "KLF", "KLS", "KMF", "KMT", "KSD", "KSQ", "KST", "KTS", "KTT", "KVC",
+	"L14", "L18", "L35", "L40", "L43", "L61", "L62", "LAS", "LBE", "LCD", "LCS", "LDP", "LHC", "LIG", "LM7", "LO5", "LUT",
+	"MAC", "MAS", "MAX", "MBG", "MBS", "MCC", "MCF", "MCL", "MCO", "MDC", "MED", "MEL", "MHL", "MIH", "MIM", "MKV", "MNC", "MPT", "MSC", "MST", "MVB",
+	"NAG", "NAP", "NBC", "NBP", "NBW", "NDN", "NDX", "NET", "NFC", "NGC", "NHC", "NHP", "NIS", "NLC", "NRC", "NSH", "NSN", "NST", "NTH", "NTP", "NVB", "NVC", "OCH", "ONE",
+	"PBP", "PCE", "PCG", "PCT", "PDB", "PDC", "PEN", "PGN", "PGS", "PGT", "PHN", "PHP", "PIA", "PIC", "PJC", "PLC", "PMB", "PMC", "PMP", "PMS", "POT", "PPE", "PPP", "PPS", "PPY", "PRC", "PRE", "PSC", "PSD", "PSE", "PSI", "PSW", "PTD", "PTI", "PTS", "PV2", "PVB", "PVC", "PVG", "PVI", "PVL", "PVS",
+	"QHD", "QST", "QTC", "RCL", "RHC",
+	"S55", "S64", "S74", "S91", "S99", "SAF", "SCI", "SD2", "SD4", "SD5", "SD6", "SD9", "SDA", "SDC", "SDG", "SDN", "SDS", "SDT", "SDU", "SEB", "SED", "SEL", "SFN", "SGC", "SGD", "SGH", "SHB", "SHE", "SHN", "SHS", "SHT", "SIC", "SJ1", "SJC", "SJE", "SKS", "SLS", "SME", "SMN", "SMT", "SNG", "SPI", "SRA", "SSM", "SSS", "STC", "STP", "SVN", "SVS", "SZB",
+	"TA9", "TAR", "TAS", "TBX", "TC6", "TCS", "TDN", "TDT", "TET", "TFC", "THB", "THD", "THS", "THT", "THV", "TIG", "TJC", "TKC", "TKU", "TLC", "TMB", "TMC", "TMX", "TNG", "TPH", "TPP", "TSB", "TSM", "TST", "TTC", "TTH", "TTL", "TTT", "TTZ", "TV3", "TV4", "TV6", "TVC", "TVD", "TXM", "UNI",
+	"V12", "V21", "VAT", "VBC", "VC1", "VC2", "VC3", "VC6", "VC7", "VC9", "VCC", "VCH", "VCM", "VCS", "VCV", "VDL", "VE1", "VE2", "VE3", "VE4", "VE8", "VGP", "VGS", "VHE", "VHL", "VIE", "VIF", "VIG", "VIT", "VKC", "VLA", "VMC", "VMI", "VMS", "VNC", "VNF", "VNR", "VNT", "VSA", "VSM", "VTC", "VTH", "VTJ", "VTL", "VTS", "VTV", "VXB", "WCS", "WSS", "X20", "YSC",
+}
 
 func main() {
 	// Get arguments
@@ -50,7 +69,7 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	*symbol = "ROS"
+	// *symbol = "ROS"
 	// *daysBefore = -15
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
