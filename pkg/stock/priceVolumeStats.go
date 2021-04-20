@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	kz "github.com/wesovilabs/koazee"
 )
 
 // PriceVolumeStats get price volume data of ticker
@@ -53,51 +51,53 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 		// Get data of last 30 days before last date
 		pvData = pvData[len(pvData)-31 : len(pvData)-1]
 
-		pvs := kz.StreamOf(pvData)
-
 		if lastPV.Volume > 99999 {
 			ratioChangePrice := (lastPV.Close - secondLastPV.Close) / secondLastPV.Close
 			ratioChangePrice = math.Round(ratioChangePrice*10000) / 10000
 
 			// Get Volumne of 10 last day
-			tenLastPV := pvs.Take(20, 29).Do()
-			avgVolume10Days := tenLastPV.Reduce(func(acc int64, pv *PriceVolume) (int64, error) {
-				return acc + pv.Volume, nil
-			}).Int64()
+			tenLastPV := pvData[20:30]
+			var avgVolume10Days int64
+			var minPrice10Days, maxPrice10Days, maxPrice30Days float64
+			for idx, pv := range tenLastPV {
+				avgVolume10Days += pv.Volume
+				if idx == 0 {
+					minPrice10Days = pv.Close
+				}
+				if minPrice10Days > pv.Close {
+					minPrice10Days = pv.Close
+				}
+				if maxPrice10Days < pv.Close {
+					maxPrice10Days = pv.Close
+				}
+			}
 			avgVolume10Days = avgVolume10Days / 10
 
-			// Get max price within last 20 days (30 days on calendar)
-			thirtyLastPV := pvs.Take(0, 29).Do()
-			maxPrice30Days := thirtyLastPV.Reduce(func(acc float64, pv *PriceVolume) (float64, error) {
-				if acc < pv.Close {
-					acc = pv.Close
+			// Get max price within last 30 days
+			thirtyLastPV := pvData[0:30]
+			for _, pv := range thirtyLastPV {
+				if maxPrice30Days < pv.Close {
+					maxPrice30Days = pv.Close
 				}
-				return acc, nil
-			}).Float64()
+			}
 			volumeChange10Days := float64(lastPV.Volume-avgVolume10Days) / float64(avgVolume10Days)
 			volumeChange10Days = math.Round(volumeChange10Days*10000) / 10000
 			priceChange30Days := float64(lastPV.Close-maxPrice30Days) / float64(maxPrice30Days)
 			priceChange30Days = math.Round(priceChange30Days*10000) / 10000
 
-			maxPriceTenDays := tenLastPV.Reduce(func(acc float64, pv *PriceVolume) (float64, error) {
-				if acc < pv.Close {
-					acc = pv.Close
-				}
-				return acc, nil
-			}).Float64()
-			tren10Days := "Sideway"
-			priceChangeTenDays := float64(lastPV.Close-maxPriceTenDays) / float64(maxPriceTenDays)
-			if priceChangeTenDays > 0.027 {
-				tren10Days = "Up"
-			} else if priceChangeTenDays < -0.06 {
-				tren10Days = "Down"
+			avgPrice10Days := (minPrice10Days + maxPrice10Days) / 2
+			trend10Days := "Sideway"
+			if lastPV.Close >= avgPrice10Days+(maxPrice10Days-avgPrice10Days)/2 && lastPV.Close >= avgPrice10Days*1.03 {
+				trend10Days = "Up"
+			} else if lastPV.Close <= avgPrice10Days-(avgPrice10Days-minPrice10Days)/2 && lastPV.Close <= avgPrice10Days*0.97 {
+				trend10Days = "Down"
 			}
 
 			result := &PriceVolumeStatsResult{
 				Ticker:                 ticker,
 				Price:                  lastPV.Close,
 				Volume:                 lastPV.Volume,
-				Trend10Days:            tren10Days,
+				Trend10Days:            trend10Days,
 				AvgVolume10Days:        avgVolume10Days,
 				HighestPrice30Days:     maxPrice30Days,
 				RatioChangeVol10Days:   volumeChange10Days,
@@ -108,13 +108,15 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 			}
 
 			// Buy signal
-			if (tren10Days == "Down" || priceChange30Days <= -0.09) && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
+			if (trend10Days == "Down" || priceChange30Days <= -0.09) && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
 				result.Suggestion = "Buy"
-			} else if (tren10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5) || (ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
+			} else
+			// Buy Signal
+			if (trend10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5) || (trend10Days != "Up" && ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
 				result.Suggestion = "Buy"
 			} else
 			// Sell signal
-			if tren10Days == "Up" && ratioChangePrice >= 0.025 && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5 {
+			if trend10Days == "Up" && ratioChangePrice >= 0.025 && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5 {
 				result.Suggestion = "Sell"
 			}
 
