@@ -1,0 +1,152 @@
+// package stock
+
+// import (
+// 	"encoding/json"
+// 	"errors"
+// 	"fmt"
+// 	"io/ioutil"
+// 	"math"
+// 	"net/http"
+// 	"strings"
+// 	"time"
+
+// 	kz "github.com/wesovilabs/koazee"
+// )
+
+// // PriceVolumeStats get price volume data of ticker
+// func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, error) {
+// 	// from := time.Now().AddDate(0, 0, daysBefore-180)
+// 	// to := time.Now().AddDate(0, 0, 1)
+// 	// url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
+// 	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
+// 	httpClient := http.Client{Timeout: time.Second * 5}
+// 	req, err := http.NewRequest(http.MethodGet, url, nil)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	res, err := httpClient.Do(req)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	body, err := ioutil.ReadAll(res.Body)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	pvBind := PriceVolumeBind{}
+// 	err = json.Unmarshal(body, &pvBind)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	if len(pvBind.Data) > 32-daysBefore {
+// 		pvData := pvBind.Data
+
+// 		// Get Price of last day
+// 		lastPV := pvData[len(pvData)-1]
+// 		secondLastPV := pvData[len(pvData)-2]
+
+// 		if strings.Split(lastPV.Date, " ")[0] == strings.Split(secondLastPV.Date, " ")[0] {
+// 			pvData = pvData[:len(pvData)-1]
+// 		}
+
+// 		// Get data of n days before if daysBefore is specify
+// 		pvData = pvData[:len(pvData)+daysBefore]
+
+// 		// Update lastPV after change pvData
+// 		lastPV = pvData[len(pvData)-1]
+// 		secondLastPV = pvData[len(pvData)-2]
+
+// 		// Get data of last 30 days before last date
+// 		pvData = pvData[len(pvData)-31 : len(pvData)-1]
+
+// 		// //init the loc
+// 		// loc, _ := time.LoadLocation("Asia/Ho_Chi_Minh")
+// 		// timeInLoc := time.Now().In(loc)
+
+// 		// var pvs stream.Stream
+// 		// if (timeInLoc.Hour() > 9 && timeInLoc.Hour() < 15) {
+// 		// 	pvs = kz.StreamOf(pvData[len(pvData) - 32:len(pvData) - 1])
+// 		// } else {
+// 		// 	pvs = kz.StreamOf(pvData[len(pvData) - 31:len(pvData)])
+// 		// }
+
+// 		pvs := kz.StreamOf(pvData)
+
+// 		if lastPV.Volume > 99999 {
+// 			// Get Volumne of 10 last day
+// 			tenLastPV := pvs.Take(20, 29).Do()
+// 			avgVolume10Days := tenLastPV.Reduce(func(acc int64, pv *PriceVolume) int64 {
+// 				return acc + pv.Volume
+// 			}).Int64()
+// 			avgVolume10Days = avgVolume10Days / 10
+
+// 			// Get max price within last 20 days (30 days on calendar)
+// 			thirtyLastPV := pvs.Take(0, 29).Do()
+// 			maxPrice30Days := thirtyLastPV.Reduce(func(acc int64, pv *PriceVolume) (int64, error) {
+// 				if acc < pv.Price {
+// 					acc = pv.Price
+// 				}
+// 				return acc, nil
+// 			}).Int64()
+// 			volumeChange10Days := float64(lastPV.Volume-avgVolume10Days) / float64(avgVolume10Days)
+// 			volumeChange10Days = math.Round(volumeChange10Days*10000) / 10000
+// 			priceChange30Days := float64(lastPV.Price-maxPrice30Days) / float64(maxPrice30Days)
+// 			priceChange30Days = math.Round(priceChange30Days*10000) / 10000
+
+// 			maxPriceTenDays := tenLastPV.Reduce(func(acc int64, pv *PriceVolume) (int64, error) {
+// 				if acc < pv.Price {
+// 					acc = pv.Price
+// 				}
+// 				return acc, nil
+// 			}).Int64()
+// 			tren10Days := "Sideway"
+// 			priceChangeTenDays := float64(lastPV.Price-maxPriceTenDays) / float64(maxPriceTenDays)
+// 			if priceChangeTenDays > 0.027 {
+// 				tren10Days = "Up"
+// 			} else if priceChangeTenDays < -0.06 {
+// 				tren10Days = "Down"
+// 			}
+
+// 			result := &PriceVolumeStatsResult{
+// 				Ticker:                 ticker,
+// 				Price:                  lastPV.Price,
+// 				Volume:                 lastPV.Volume,
+// 				Trend10Days:            tren10Days,
+// 				AvgVolume10Days:        avgVolume10Days,
+// 				HighestPrice30Days:     maxPrice30Days,
+// 				RatioChangeVol10Days:   volumeChange10Days,
+// 				RatioChangePrice30Days: priceChange30Days,
+// 				RatioChangePrice:       lastPV.RatioChangePrice,
+// 				Date:                   lastPV.Date,
+// 				Suggestion:             "None",
+// 			}
+
+// 			// Buy signal
+// 			if (tren10Days == "Down" || priceChange30Days <= -0.09) && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
+// 				result.Suggestion = "Buy"
+// 			} else if (tren10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5) || (lastPV.RatioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
+// 				result.Suggestion = "Buy"
+// 			} else
+// 			// Sell signal
+// 			if tren10Days == "Up" && lastPV.RatioChangePrice >= 0.025 && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5 {
+// 				result.Suggestion = "Sell"
+// 			}
+
+// 			return result, nil
+// 		} else {
+// 			result := &PriceVolumeStatsResult{
+// 				Ticker:     ticker,
+// 				Price:      lastPV.Price,
+// 				Volume:     lastPV.Volume,
+// 				Date:       lastPV.Date,
+// 				Suggestion: "None - Volume too small",
+// 			}
+// 			return result, nil
+// 		}
+// 	} else {
+// 		return nil, errors.New("There are not enough translog records of " + ticker)
+// 	}
+// }

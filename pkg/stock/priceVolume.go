@@ -6,6 +6,16 @@ import (
 
 // PriceVolume is data of stock price and volume
 type PriceVolume struct {
+	Open        float64 `json:"open"`
+	High        float64 `json:"high"`
+	Low         float64 `json:"low"`
+	Close       float64 `json:"close"`
+	Volume      int64   `json:"volume"`
+	TradingDate string  `json:"tradingDate"`
+}
+
+// PriceVolume2 is data of stock price and volume
+type PriceVolume2 struct {
 	Price            int64   `json:"p"`
 	ChangePrice      int64   `json:"cp"`
 	RatioChangePrice float64 `json:"rcp"`
@@ -16,11 +26,11 @@ type PriceVolume struct {
 // PriceVolumeStatsResult is result of price volume stats
 type PriceVolumeStatsResult struct {
 	Ticker                 string  `json:"ticker"`
-	Price                  int64   `json:"price"`
+	Price                  float64 `json:"price"`
 	Volume                 int64   `json:"volume"`
-	Trend                  string  `json:"trend"`
+	Trend10Days            string  `json:"trend"`
 	AvgVolume10Days        int64   `json:"avg_volume_10_days"`
-	HighestPrice30Days     int64   `json:"highest_price_30_days"`
+	HighestPrice30Days     float64 `json:"highest_price_30_days"`
 	RatioChangeVol10Days   float64 `json:"ratio_change_vol_10_days"`
 	RatioChangePrice30Days float64 `json:"ratio_change_price_30_days"`
 	RatioChangePrice       float64 `json:"ratio_change_price"`
@@ -38,11 +48,11 @@ func (r *PriceVolumeStatsResult) ToString() string {
 	str := fmt.Sprintf(`
 		Date: %s
 		Symbol: %s
-		Price: %d
-		Volume: %d
+		Price: %.0f
 		Trend: %s
-		Avg Volume: %d
-		Highest Price: %d
+		Volume: %d
+		Avg Volume 10 days: %d
+		Highest Price 30 days: %.0f
 		Change Volume 10 days: %.2f%%
 		Change Price 30 days: %.2f%%
 		Change Price today: %.2f%%
@@ -51,8 +61,8 @@ func (r *PriceVolumeStatsResult) ToString() string {
 		r.Date,
 		r.Ticker,
 		r.Price,
+		r.Trend10Days,
 		r.Volume,
-		r.Trend,
 		r.AvgVolume10Days,
 		r.HighestPrice30Days,
 		r.RatioChangeVol10Days*100,
