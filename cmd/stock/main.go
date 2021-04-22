@@ -77,7 +77,7 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	// *symbol = "MBB"
+	// *symbol = "CTG"
 	// *daysBefore = -19
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }

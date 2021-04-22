@@ -14,9 +14,10 @@ import (
 // PriceVolumeStats get price volume data of ticker
 func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, error) {
 	from := time.Now().AddDate(0, 0, daysBefore-180)
-	to := time.Now().AddDate(0, 0, 1)
+	to := time.Now().Add(1 * time.Hour) //.AddDate(0, 0, 1)
 	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
 	// url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
+	// fmt.Println(url)
 	httpClient := http.Client{Timeout: time.Second * 5}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
