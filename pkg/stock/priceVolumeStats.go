@@ -14,7 +14,8 @@ import (
 // PriceVolumeStats get price volume data of ticker
 func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, error) {
 	from := time.Now().AddDate(0, 0, daysBefore-180)
-	to := time.Now().Add(1 * time.Hour) //.AddDate(0, 0, 1)
+	to := time.Now().AddDate(0, 0, 1)
+	// to := time.Now().Add(1 * time.Hour)
 	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
 	// url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
 	// fmt.Println(url)
@@ -109,16 +110,23 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 			}
 
 			// Buy signal
-			if (trend10Days == "Down" || priceChange30Days <= -0.09) && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
+			if trend10Days == "Down" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
 				result.Suggestion = "Buy"
-			} else
-			// Buy Signal
-			if (trend10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5) || (trend10Days != "Up" && ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
+				result.Reason = "Down trend, Volume >= 120%"
+			} else if priceChange30Days <= -0.09 && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2 {
 				result.Suggestion = "Buy"
+				result.Reason = "Price 30 days down >= 9%, Volume >= 120%"
+			} else if trend10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5 {
+				result.Suggestion = "Buy"
+				result.Reason = "Sideway, Volume >= 150%"
+			} else if trend10Days != "Up" && ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days {
+				result.Suggestion = "Buy"
+				result.Reason = "Price down 2.5%, Volume >= Avg"
 			} else
 			// Sell signal
 			if trend10Days == "Up" && ratioChangePrice >= 0.025 && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5 {
 				result.Suggestion = "Sell"
+				result.Reason = "Up trend, Volume >= Avg"
 			}
 
 			return result, nil

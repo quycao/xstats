@@ -14,6 +14,43 @@ type PriceVolume struct {
 	TradingDate string  `json:"tradingDate"`
 }
 
+// CurrentPriceVolume is current price data
+type CurrentPriceVolume struct {
+	Ticker                string  `json:"Ticker"`
+	CeilingPrice          float64 `json:"ceilingPrice"`
+	FloorPrice            float64 `json:"floorPrice"`
+	OpenPrice             float64 `json:"openPrice"`
+	HighPrice             float64 `json:"highPrice"`
+	LowPrice              float64 `json:"lowPrice"`
+	CurrentPrice          float64 `json:"currentPrice"`
+	ReferencePrice        float64 `json:"referencePrice"`
+	AveragePrice          float64 `json:"averagePrice"`
+	Change                float64 `json:"change"`
+	AccumulatedVolume     int64   `json:"accumulatedVolume"`
+	AccumulatedValue      float64 `json:"accumulatedValue"`
+	ForeignRemain         int64   `json:"foreignRemain"`
+	ForeignRoom           int64   `json:"foreignRoom"`
+	Bid1Price             float64 `json:"bid1Price"`
+	Bid2Price             float64 `json:"bid2Price"`
+	Bid3Price             float64 `json:"bid3Price"`
+	Ask1Price             float64 `json:"ask1Price"`
+	Ask2Price             float64 `json:"ask2Price"`
+	Ask3Price             float64 `json:"ask3Price"`
+	Bid1Volume            int64   `json:"bid1Volume"`
+	Bid2Volume            int64   `json:"bid2Volume"`
+	Bid3Volume            int64   `json:"bid3Volume"`
+	Ask1Volume            int64   `json:"ask1Volume"`
+	Ask2Volume            int64   `json:"ask2Volume"`
+	Ask3Volume            int64   `json:"ask3Volume"`
+	ForeignBuy            int64   `json:"foreignBuy"`
+	ForeignSell           int64   `json:"foreignSell"`
+	PtTotalTradedQuantity int64   `json:"ptTotalTradedQuantity"`
+	PtTotalTradedValue    float64 `json:"ptTotalTradedValue"`
+	TotalAskQuantity      int64   `json:"totalAskQuantity"`
+	TotalBidQuantity      int64   `json:"totalBidQuantity"`
+	TradingDate           string  `json:"tradingDate"`
+}
+
 // PriceVolume2 is data of stock price and volume
 type PriceVolume2 struct {
 	Price            int64   `json:"p"`
@@ -36,6 +73,7 @@ type PriceVolumeStatsResult struct {
 	RatioChangePrice       float64 `json:"ratio_change_price"`
 	Date                   string  `json:"Date"`
 	Suggestion             string  `json:"suggestion"`
+	Reason                 string  `json:"reason"`
 }
 
 // PriceVolumeBind is binding for PriceVolume
@@ -57,6 +95,7 @@ func (r *PriceVolumeStatsResult) ToString() string {
 		Change Price 30 days: %.2f%%
 		Change Price today: %.2f%%
 		Suggestion: %s
+		Reason: %s
 		`,
 		r.Date,
 		r.Ticker,
@@ -69,6 +108,7 @@ func (r *PriceVolumeStatsResult) ToString() string {
 		r.RatioChangePrice30Days*100,
 		r.RatioChangePrice*100,
 		r.Suggestion,
+		r.Reason,
 	)
 
 	return str
