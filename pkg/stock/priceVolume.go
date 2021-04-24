@@ -84,19 +84,19 @@ type PriceVolumeBind struct {
 
 func (r *PriceVolumeStatsResult) ToString() string {
 	str := fmt.Sprintf(`
-		Date: %s
-		Symbol: %s
-		Price: %.0f
-		Trend: %s
-		Volume: %d
-		Avg Volume 10 days: %d
-		Highest Price 30 days: %.0f
-		Change Volume 10 days: %.2f%%
-		Change Price 30 days: %.2f%%
-		Change Price today: %.2f%%
-		Suggestion: %s
-		Reason: %s
-		`,
+	Date: %s
+	Symbol: %s
+	Price: %.0f
+	Trend: %s
+	Volume: %d
+	Avg Volume 10 days: %d
+	Highest Price 30 days: %.0f
+	Change Volume 10 days: %.2f%%
+	Change Price 30 days: %.2f%%
+	Change Price today: %.2f%%
+	Suggestion: %s
+	Reason: %s
+	`,
 		r.Date,
 		r.Ticker,
 		r.Price,
