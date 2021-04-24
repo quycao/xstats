@@ -121,8 +121,8 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 				if isUpdated {
 					tm.MoveCursor(1, 1)
 					// Create Box with 30% width of current screen, and height of 20 lines
-					buyBox := tm.NewBox(50|tm.PCT, 20, 5)
-					sellBox := tm.NewBox(50|tm.PCT, 20, 5)
+					buyBox := tm.NewBox(50|tm.PCT, 80|tm.PCT, 5)
+					sellBox := tm.NewBox(50|tm.PCT, 80|tm.PCT, 5)
 
 					// Add some content to the box
 					// Note that you can add ANY content, even tables
