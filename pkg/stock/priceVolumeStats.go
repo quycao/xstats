@@ -12,33 +12,75 @@ import (
 )
 
 // PriceVolumeStats get price volume data of ticker
-func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, error) {
+func PriceVolumeStats(ticker string, daysBefore int, getMarketData bool) (*PriceVolumeStatsResult, bool, error) {
 	from := time.Now().AddDate(0, 0, daysBefore-180)
 	to := time.Now().AddDate(0, 0, 1)
 	// to := time.Now().Add(1 * time.Hour)
-	url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
-	// url := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
-	// fmt.Println(url)
+	barsLongTermUrl := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
+	// barsLongTermUrl := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
+	// fmt.Println(barsLongTermUrl)
 	httpClient := http.Client{Timeout: time.Second * 5}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, barsLongTermUrl, nil)
 	if err != nil {
-		return nil, err
+		return nil, getMarketData, err
 	}
 
 	res, err := httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, getMarketData, err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, getMarketData, err
 	}
 
 	pvBind := PriceVolumeBind{}
 	err = json.Unmarshal(body, &pvBind)
 	if err != nil {
-		return nil, err
+		return nil, getMarketData, err
+	}
+
+	if daysBefore == 0 && getMarketData {
+		stockMarketDataUrl := fmt.Sprintf("https://priceservice.tcbs.com.vn/priceservice/stock/%s/stock-market-data", ticker)
+		req, err = http.NewRequest(http.MethodGet, stockMarketDataUrl, nil)
+		if err != nil {
+			return nil, getMarketData, err
+		}
+
+		res, err = httpClient.Do(req)
+		if err != nil {
+			return nil, getMarketData, err
+		}
+
+		body, err = ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, getMarketData, err
+		}
+
+		cpv := CurrentPriceVolume{}
+		err = json.Unmarshal(body, &cpv)
+		if err != nil {
+			return nil, getMarketData, err
+		}
+
+		lastPV := pvBind.Data[len(pvBind.Data)-1]
+		lastPVTradingDateStr := strings.Split(lastPV.TradingDate, "T")[0]
+		tradingDate, _ := time.Parse("02/01/2006", cpv.TradingDate)
+		tradingDateStr := tradingDate.Format("2006-01-02")
+		if lastPVTradingDateStr == tradingDateStr && lastPV.Close == cpv.CurrentPrice && lastPV.Volume == cpv.AccumulatedVolume {
+			getMarketData = false
+		} else {
+			priceVolume := &PriceVolume{
+				Open:        cpv.OpenPrice,
+				High:        cpv.HighPrice,
+				Low:         cpv.LowPrice,
+				Close:       cpv.CurrentPrice,
+				Volume:      cpv.AccumulatedVolume,
+				TradingDate: cpv.TradingDate,
+			}
+			pvBind.Data = append(pvBind.Data, priceVolume)
+		}
 	}
 
 	if len(pvBind.Data) > 32-daysBefore {
@@ -129,7 +171,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				result.Reason = "Up trend, Volume >= Avg"
 			}
 
-			return result, nil
+			return result, getMarketData, nil
 		} else {
 			result := &PriceVolumeStatsResult{
 				Ticker:     ticker,
@@ -138,9 +180,9 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				Date:       strings.Split(lastPV.TradingDate, "T")[0],
 				Suggestion: "None - Volume too small",
 			}
-			return result, nil
+			return result, getMarketData, nil
 		}
 	} else {
-		return nil, errors.New("There are not enough translog records of " + ticker)
+		return nil, getMarketData, errors.New("There are not enough translog records of " + ticker)
 	}
 }

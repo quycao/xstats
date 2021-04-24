@@ -78,7 +78,7 @@ func main() {
 	// }
 
 	// *symbol = "CTG"
-	// *daysBefore = -19
+	*daysBefore = -1
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 
@@ -91,14 +91,21 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 		tm.Clear() // Clear current screen
 		var sellList []string
 		var buyList []string
-		for _, input := range inputs {
+		var isGetMarketData = false
+		if daysBefore == 0 {
+			isGetMarketData = true
+		}
+		for idx, input := range inputs {
 			// remove the delimeter from the string
 			input = strings.TrimSuffix(input, "\n")
 			input = strings.ToUpper(input)
-			pvStatsResult, err := stock.PriceVolumeStats(input, daysBefore)
+			pvStatsResult, getMarketData, err := stock.PriceVolumeStats(input, daysBefore, isGetMarketData)
 			if err != nil {
 				continue
 			} else if pvStatsResult != nil {
+				if idx == 0 {
+					isGetMarketData = getMarketData
+				}
 				var isUpdated bool
 				if pvStatsResult.Suggestion == "Buy" {
 					isUpdated = true
@@ -136,7 +143,7 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 	} else {
 		symbol = strings.TrimSuffix(symbol, "\n")
 		symbol = strings.ToUpper(symbol)
-		pvStatsResult, err := stock.PriceVolumeStats(symbol, daysBefore)
+		pvStatsResult, _, err := stock.PriceVolumeStats(symbol, daysBefore, true)
 		if err == nil {
 			fmt.Println(pvStatsResult.ToString())
 		} else {
