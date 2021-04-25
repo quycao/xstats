@@ -14,8 +14,8 @@ import (
 // PriceVolumeStats get price volume data of ticker
 func PriceVolumeStats(ticker string, daysBefore int, getMarketData bool) (*PriceVolumeStatsResult, bool, error) {
 	from := time.Now().AddDate(0, 0, daysBefore-180)
-	to := time.Now().AddDate(0, 0, 1)
-	// to := time.Now().Add(1 * time.Hour)
+	to := time.Now() //.Add(1 * time.Hour)
+	// to := time.Now().AddDate(0, 0, 1)
 	barsLongTermUrl := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/stock/bars-long-term?ticker=%s&type=stock&resolution=D&from=%d&to=%d", ticker, from.Unix(), to.Unix())
 	// barsLongTermUrl := fmt.Sprintf("https://apiazure.tcbs.com.vn/public/stock-insight/v1/intraday/%s/pv?resolution=1440", ticker)
 	// fmt.Println(barsLongTermUrl)
