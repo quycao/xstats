@@ -112,7 +112,7 @@ func PriceVolumeStats(ticker string, daysBefore int) (*PriceVolumeStatsResult, e
 				result.Suggestion = "Buy"
 			} else
 			// Buy Signal
-			if (trend10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.5) || (trend10Days != "Up" && ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
+			if (trend10Days == "Sideway" && float64(lastPV.Volume) >= float64(avgVolume10Days)*1.2) || (trend10Days != "Up" && ratioChangePrice <= -0.025 && lastPV.Volume >= avgVolume10Days) {
 				result.Suggestion = "Buy"
 			} else
 			// Sell signal

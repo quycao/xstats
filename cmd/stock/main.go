@@ -52,7 +52,7 @@ var inputs = []string{
 	"ABC", "ABI", "ACV", "AFX", "AGX", "AMS", "APF", "AVC", "BAB", "BCM", "BDT", "BHA", "BLI", "BMS", "BNW", "BOT", "BPW", "BRR", "BSA", "BSG", "BSL", "BSQ", "BSR", "BT6", "BTC", "BUD", "BWS",
 	"C21", "C4G", "CC1", "CDO", "CKD", "CLX", "CMF", "CMP", "CTR", "CTW", "DBW", "DDV", "DNA", "DNH", "DNN", "DNW", "DRI", "DSP", "DTK", "DVN", "DWS", "EIC", "EIN", "EVF", "EVS", "FIC", "FOC", "FOX",
 	"G36", "GEG", "GHC", "GSM", "GTS", "GVR", "HAN", "HC3", "HDW", "HEM", "HEP", "HGW", "HIG", "HNA", "HND", "HNR", "HPI", "HPP", "HPW", "HRT", "HSM", "HTG", "HTM", "HUG", "HWS", "IDC", "IFS", "ILS", "IPA", "ISH",
-	"KDF", "KHA", "KHW", "KLB", "KOS", "KSV", "KTC", "KTL", "LDW", "LIC", "LLM", "LPB", "LTG", "M10", "MCH", "MDF", "MIE", "MIG", "MKP", "MNB", "MPC", "MQB", "MSR", "MTA", "MVB", "MVC", "MVN",
+	"KDF", "KHA", "KHW", "KLB", "KSV", "KTC", "KTL", "LDW", "LIC", "LLM", "LPB", "LTG", "M10", "MCH", "MDF", "MIE", "MIG", "MKP", "MNB", "MPC", "MQB", "MSR", "MTA", "MVB", "MVC", "MVN",
 	"NAW", "NBT", "NCP", "ND2", "NED", "NHH", "NLS", "NNG", "NQN", "NS2", "NTC", "OIL", "PDT", "PEG", "PFL", "PGV", "PIS", "POS", "PPH", "PRT", "PSB", "PSN", "PSP", "PVM", "PVP", "PXL", "QNS", "QTP",
 	"RGC", "RTB", "SAS", "SBH", "SBM", "SCY", "SDI", "SEA", "SGP", "SID", "SJG", "SKH", "SNZ", "SQC", "SRT", "SSN", "SWC", "SZE", "TBD", "TCI", "TCW", "TDP", "THN", "TID", "TIS", "TL4", "TLP", "TMG", "TND", "TSJ", "TTP", "TVN",
 	"VAV", "VCP", "VCW", "VEA", "VEC", "VEF", "VET", "VFC", "VGG", "VGI", "VGR", "VGT", "VGV", "VIB", "VIF", "VIN", "VIW", "VLB", "VLC", "VLW", "VNB", "VOC", "VSF", "VSN", "VTP", "WSB", "XDH",
