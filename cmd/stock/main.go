@@ -77,8 +77,8 @@ func main() {
 	// 	priceVolumeAnalyse()
 	// }
 
-	// *symbol = "MBB"
-	// *daysBefore = -19
+	// *symbol = "CTG"
+	// *daysBefore = -1
 	priceVolumeAnalyse(*symbol, *daysBefore)
 }
 
@@ -91,14 +91,21 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 		tm.Clear() // Clear current screen
 		var sellList []string
 		var buyList []string
-		for _, input := range inputs {
+		var isGetMarketData = false
+		if daysBefore == 0 {
+			isGetMarketData = true
+		}
+		for idx, input := range inputs {
 			// remove the delimeter from the string
 			input = strings.TrimSuffix(input, "\n")
 			input = strings.ToUpper(input)
-			pvStatsResult, err := stock.PriceVolumeStats(input, daysBefore)
+			pvStatsResult, getMarketData, err := stock.PriceVolumeStats(input, daysBefore, isGetMarketData)
 			if err != nil {
 				continue
 			} else if pvStatsResult != nil {
+				if idx == 0 {
+					isGetMarketData = getMarketData
+				}
 				var isUpdated bool
 				if pvStatsResult.Suggestion == "Buy" {
 					isUpdated = true
@@ -114,8 +121,8 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 				if isUpdated {
 					tm.MoveCursor(1, 1)
 					// Create Box with 30% width of current screen, and height of 20 lines
-					buyBox := tm.NewBox(50|tm.PCT, 20, 5)
-					sellBox := tm.NewBox(50|tm.PCT, 20, 5)
+					buyBox := tm.NewBox(50|tm.PCT, 80|tm.PCT, 5)
+					sellBox := tm.NewBox(50|tm.PCT, 80|tm.PCT, 5)
 
 					// Add some content to the box
 					// Note that you can add ANY content, even tables
@@ -136,7 +143,7 @@ func priceVolumeAnalyse(symbol string, daysBefore int) {
 	} else {
 		symbol = strings.TrimSuffix(symbol, "\n")
 		symbol = strings.ToUpper(symbol)
-		pvStatsResult, err := stock.PriceVolumeStats(symbol, daysBefore)
+		pvStatsResult, _, err := stock.PriceVolumeStats(symbol, daysBefore, true)
 		if err == nil {
 			fmt.Println(pvStatsResult.ToString())
 		} else {
